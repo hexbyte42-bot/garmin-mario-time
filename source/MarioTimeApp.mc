@@ -1,0 +1,154 @@
+using Toybox.Application;
+using Toybox.WatchUi;
+using Toybox.Graphics;
+using Toybox.System;
+using Toybox.Time;
+using Toybox.Time.Gregorian;
+using Toybox.Timer;
+using Toybox.Lang;
+
+class MarioTimeApp extends Application.AppBase {
+    function initialize() {
+        AppBase.initialize();
+    }
+
+    function onStart(state) {}
+    function onStop(state) {}
+
+    function getInitialView() {
+        return [new MarioTimeView()];
+    }
+}
+
+class MarioTimeView extends WatchUi.WatchFace {
+    var marioNormalBitmap;
+    var marioJumpBitmap;
+    var blockBitmap;
+    var backgroundDayBitmap;
+    var backgroundNightBitmap;
+
+    var marioIsDown = true;
+    var animationStartTime = 0;
+    var animationDuration = 400;
+    var jumpTimer = null;
+
+    var screenWidth = 0;
+    var screenHeight = 0;
+
+    function initialize() {
+        WatchFace.initialize();
+    }
+
+    function onLayout(dc) {
+        screenWidth = dc.getWidth();
+        screenHeight = dc.getHeight();
+
+        try { marioNormalBitmap = WatchUi.loadResource(Rez.Drawables.mario_normal); } catch (e) { marioNormalBitmap = null; }
+        try { marioJumpBitmap = WatchUi.loadResource(Rez.Drawables.mario_jump); } catch (e) { marioJumpBitmap = null; }
+        try { blockBitmap = WatchUi.loadResource(Rez.Drawables.block); } catch (e) { blockBitmap = null; }
+        try { backgroundDayBitmap = WatchUi.loadResource(Rez.Drawables.background_day); } catch (e) { backgroundDayBitmap = null; }
+        try { backgroundNightBitmap = WatchUi.loadResource(Rez.Drawables.background_night); } catch (e) { backgroundNightBitmap = null; }
+
+        return;
+    }
+
+    function onUpdate(dc) {
+        // Draw background (now 416x416, fills the screen)
+        var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var hour = now.hour;
+        var bg = backgroundDayBitmap;
+
+        if (hour < 6 || hour >= 18) {
+            bg = backgroundNightBitmap;
+        }
+
+        if (bg != null) {
+            dc.drawBitmap(0, 0, bg);
+        } else {
+            dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
+            dc.fillRectangle(0, 0, screenWidth, screenHeight);
+        }
+
+        // Calculate block positions (blocks are now 120x120)
+        var blockSize = 120;
+        var blockX = (screenWidth - blockSize * 2) / 2;
+        var blockY = 80;
+
+        // Animate blocks when Mario jumps
+        if (!marioIsDown) {
+            var progress = getAnimationProgress();
+            var bounceHeight = 15;
+            blockY = blockY - (bounceHeight * Math.sin(progress * Math.PI)).toNumber();
+        }
+
+        // Draw blocks
+        if (blockBitmap != null) {
+            dc.drawBitmap(blockX, blockY, blockBitmap);
+            dc.drawBitmap(blockX + blockSize, blockY, blockBitmap);
+        }
+
+        // Draw time in blocks (centered in each 100x100 block)
+        var hourVal = now.hour;
+        var minVal = now.min;
+        var is24Hour = System.getDeviceSettings().is24Hour;
+        if (!is24Hour) {
+            if (hourVal > 12) { hourVal = hourVal - 12; } else if (hourVal == 0) { hourVal = 12; }
+        }
+        var hourStr = hourVal.format("%d");
+        var minStr = minVal.format("%02d");
+
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+        // Calculate visual center of block
+        var textY = blockY + 1;
+
+        // Use medium font that fits in 120x120 block
+        dc.drawText(blockX + blockSize/2, textY, Graphics.FONT_SYSTEM_NUMBER_MEDIUM, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + blockSize + blockSize/2, textY, Graphics.FONT_SYSTEM_NUMBER_MEDIUM, minStr, Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Draw Mario (now 120x120)
+        var marioBitmap = marioIsDown ? marioNormalBitmap : marioJumpBitmap;
+        if (marioBitmap != null) {
+            var marioX = (screenWidth - 120) / 2;
+            var marioY = screenHeight - 160;
+
+            if (!marioIsDown) {
+                var progress = getAnimationProgress();
+                var jumpHeight = 80;
+                var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
+                marioY = marioY - offset;
+            }
+
+            dc.drawBitmap(marioX, marioY, marioBitmap);
+        }
+    }
+
+    function getAnimationProgress() {
+        if (animationStartTime == 0) { return 0.0; }
+        var elapsed = System.getTimer() - animationStartTime;
+        if (elapsed >= animationDuration) { return 1.0; }
+        return elapsed.toFloat() / animationDuration.toFloat();
+    }
+
+    function startMarioJump() {
+        if (!marioIsDown) { return; }
+        marioIsDown = false;
+        animationStartTime = System.getTimer();
+        if (jumpTimer == null) { jumpTimer = new Timer.Timer(); }
+        jumpTimer.start(method(:onJumpUpdate), 33, true);
+        WatchUi.requestUpdate();
+    }
+
+    function onJumpUpdate() {
+        var elapsed = System.getTimer() - animationStartTime;
+        if (elapsed >= animationDuration) {
+            marioIsDown = true;
+            animationStartTime = 0;
+            if (jumpTimer != null) { jumpTimer.stop(); }
+        }
+        WatchUi.requestUpdate();
+    }
+
+    function onPartialUpdate(dc) {
+        startMarioJump();
+    }
+}

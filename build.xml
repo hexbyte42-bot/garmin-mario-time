@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MarioTimeColor" default="build">
+    <property name="sdk.dir" value="${env.CONNECTIQ_SDK}"/>
+    <property name="device" value="forerunner265"/>
+    
+    <!-- Import the SDK build file -->
+    <import file="${sdk.dir}/bin/monkeyc-build.xml"/>
+    
+    <!-- Define source and resource directories -->
+    <property name="src.dir" value="source"/>
+    <property name="res.dir" value="resources"/>
+    
+    <!-- Build target -->
+    <target name="build" depends="init">
+        <echo message="Building Mario Time Color for Garmin Connect IQ"/>
+        <monkeyc 
+            appname="MarioTimeColor"
+            devices="${device}"
+            srcdir="${src.dir}"
+            resdir="${res.dir}"
+            output="bin"
+            debug="false"/>
+    </target>
+    
+    <!-- Install target -->
+    <target name="install" depends="build">
+        <echo message="Installing Mario Time Color to device"/>
+        <monkeydo 
+            appname="MarioTimeColor"
+            device="${device}"
+            output="bin"/>
+    </target>
+</project>

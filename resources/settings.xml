@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+    <setting propertyKey="@Properties.character" title="@Strings.CharacterTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.CharacterMario</listEntry>
+            <listEntry value="1">@Strings.CharacterLuigi</listEntry>
+            <listEntry value="2">@Strings.CharacterBowser</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.background" title="@Strings.BackgroundTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.BackgroundAuto</listEntry>
+            <listEntry value="1">@Strings.BackgroundDay</listEntry>
+            <listEntry value="2">@Strings.BackgroundNight</listEntry>
+            <listEntry value="3">@Strings.BackgroundUnderground</listEntry>
+            <listEntry value="4">@Strings.BackgroundCastle</listEntry>
+        </settingConfig>
+    </setting>
+</settings>
