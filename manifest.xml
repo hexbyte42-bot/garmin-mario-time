@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
-    <iq:application entry="MarioTimeApp" id="767f82c3abf84a7e98f7d73e4ebb961e" type="watchface" name="@Strings.AppName" launcherIcon="@Drawables.launcher_icon" minSdkVersion="3.1.0">
+    <iq:application entry="MarioTimeApp" id="767f82c3abf84a7e98f7d73e4ebb961e" type="watchface" name="@Strings.AppName" launcherIcon="@Drawables.launcher_icon" minSdkVersion="5.2.0">
         <iq:products>
             <iq:product id="fr265"/>
         </iq:products>
