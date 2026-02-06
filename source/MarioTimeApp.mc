@@ -26,6 +26,8 @@ class MarioTimeView extends WatchUi.WatchFace {
     var blockBitmap;
     var backgroundDayBitmap;
     var backgroundNightBitmap;
+    var backgroundUndergroundBitmap;
+    var backgroundCastleBitmap;
 
     var marioIsDown = true;
     var animationStartTime = 0;
@@ -34,6 +36,7 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     var screenWidth = 0;
     var screenHeight = 0;
+    var lastMinute = -1;
 
     function initialize() {
         WatchFace.initialize();
@@ -48,18 +51,34 @@ class MarioTimeView extends WatchUi.WatchFace {
         try { blockBitmap = WatchUi.loadResource(Rez.Drawables.block); } catch (e) { blockBitmap = null; }
         try { backgroundDayBitmap = WatchUi.loadResource(Rez.Drawables.background_day); } catch (e) { backgroundDayBitmap = null; }
         try { backgroundNightBitmap = WatchUi.loadResource(Rez.Drawables.background_night); } catch (e) { backgroundNightBitmap = null; }
+        try { backgroundUndergroundBitmap = WatchUi.loadResource(Rez.Drawables.background_underground); } catch (e) { backgroundUndergroundBitmap = null; }
+        try { backgroundCastleBitmap = WatchUi.loadResource(Rez.Drawables.background_castle); } catch (e) { backgroundCastleBitmap = null; }
 
         return;
     }
 
     function onUpdate(dc) {
-        // Draw background (now 416x416, fills the screen)
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        
+        // Check for minute change - this is the correct way to detect minute changes
+        if (now.min != lastMinute) {
+            lastMinute = now.min;
+            startMarioJump();
+        }
+
+        // Draw background (now 416x416, fills the screen)
         var hour = now.hour;
         var bg = backgroundDayBitmap;
 
-        if (hour < 6 || hour >= 18) {
+        // Enhanced background switching logic
+        if (hour >= 22 || hour < 6) {
             bg = backgroundNightBitmap;
+        } else if (hour >= 6 && hour < 12) {
+            bg = backgroundDayBitmap;
+        } else if (hour >= 12 && hour < 18) {
+            bg = backgroundUndergroundBitmap;
+        } else {
+            bg = backgroundCastleBitmap;
         }
 
         if (bg != null) {
@@ -98,9 +117,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         var minStr = minVal.format("%02d");
 
         // Draw time in blocks using custom pixel font
-        // Font height is 49px, block is 100px
-        // Current font Y: 119-156, need to move up to center in block (78-175)
-        var textY = blockY + 30;  // Move up by 10px
+        var textY = blockY + 30;  // Center text in block
         
         // Load custom pixel font
         var timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font);
@@ -114,14 +131,14 @@ class MarioTimeView extends WatchUi.WatchFace {
         var marioBitmap = marioIsDown ? marioNormalBitmap : marioJumpBitmap;
         if (marioBitmap != null) {
             var marioX = (screenWidth - 120) / 2;
-            // Position Mario below blocks (block bottom is ~175, Mario head at ~253)
-            var marioY = 253 - 120 + 20;  // Adjust so head is at Y=253 when not jumping
+            // Position Mario on the ground (ground at Y=375, Mario height=120)
+            var marioY = 375 - 120;  // Mario stands on ground at Y=375
 
             if (!marioIsDown) {
                 var progress = getAnimationProgress();
                 var jumpHeight = 60;
                 var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
-                marioY = marioY - offset;
+                marioY = marioY - offset;  // Jump upward (negative offset)
             }
 
             dc.drawBitmap(marioX, marioY, marioBitmap);
@@ -139,8 +156,10 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (!marioIsDown) { return; }
         marioIsDown = false;
         animationStartTime = System.getTimer();
-        if (jumpTimer == null) { jumpTimer = new Timer.Timer(); }
-        jumpTimer.start(method(:onJumpUpdate), 33, true);
+        if (jumpTimer == null) { 
+            jumpTimer = new Timer.Timer(); 
+        }
+        jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
         WatchUi.requestUpdate();
     }
 
@@ -157,8 +176,10 @@ class MarioTimeView extends WatchUi.WatchFace {
         WatchUi.requestUpdate();
     }
 
-    // Called every minute when time changes
-    function onMinuteChanged() {
-        startMarioJump();
+    // Handle partial updates to ensure smooth animation
+    function onPartialUpdate(dc) {
+        if (!marioIsDown) {
+            WatchUi.requestUpdate();
+        }
     }
 }
