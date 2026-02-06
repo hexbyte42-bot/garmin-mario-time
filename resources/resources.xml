@@ -1,0 +1,34 @@
+<resources>
+    <!-- Launcher Icon -->
+    <bitmap id="launcher_icon" filename="launcher_icon.png" />
+
+    <!-- Character Bitmaps (Color versions from Pebble Time) -->
+    <bitmap id="mario_normal" filename="mario_normal.png" />
+    <bitmap id="mario_jump" filename="mario_jump.png" />
+    <bitmap id="luigi_normal" filename="luigi_normal.png" />
+    <bitmap id="luigi_jump" filename="luigi_jump.png" />
+    <bitmap id="bowser_normal" filename="bowser_normal.png" />
+    <bitmap id="bowser_jump" filename="bowser_jump.png" />
+
+    <!-- Background Bitmaps (Color basalt versions for Pebble Time) -->
+    <bitmap id="background_day" filename="background_day.png" />
+    <bitmap id="background_night" filename="background_night.png" />
+    <bitmap id="background_underground" filename="background_underground.png" />
+    <bitmap id="background_castle" filename="background_castle.png" />
+
+    <!-- UI Elements (Color versions) -->
+    <bitmap id="block" filename="block.png" />
+
+    <!-- Strings -->
+    <string id="AppName">Mario Time</string>
+    <string id="CharacterTitle">Character</string>
+    <string id="CharacterMario">Mario</string>
+    <string id="CharacterLuigi">Luigi</string>
+    <string id="CharacterBowser">Bowser</string>
+    <string id="BackgroundTitle">Background</string>
+    <string id="BackgroundAuto">Auto</string>
+    <string id="BackgroundDay">Day</string>
+    <string id="BackgroundNight">Night</string>
+    <string id="BackgroundUnderground">Underground</string>
+    <string id="BackgroundCastle">Castle</string>
+</resources>
