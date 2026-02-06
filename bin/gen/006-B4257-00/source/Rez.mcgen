@@ -20,6 +20,10 @@ module Rez {
         (:initialized) var launcher_icon as ResourceId;
     } // Drawables
 
+    module Fonts {
+        (:initialized) var pixel_font as ResourceId;
+    } // Fonts
+
     module Strings {
         (:initialized) var CharacterTitle as ResourceId;
         (:initialized) var BackgroundUnderground as ResourceId;

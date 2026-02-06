@@ -361,9 +361,9 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_42_26_53
     }
     [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 55; @symbol_functiondef = [onUpdate,55,13,21]; @symbol_param<0> = [dc,55,22,24]; ]
     function onUpdate(dc) {
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start:
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 57 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %now.1 = local;
         symbol [ now %now.1 57 12 15 ];
         symbol [ Gregorian %tmp.1 57 18 27 ];
@@ -383,7 +383,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_12
         lputv %now.1 %tmp.8;
         symbol [ now %now.1 57 12 15 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 58 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %hour.2 = local;
         symbol [ hour %hour.2 58 12 16 ];
         %tmp.9 = lgetv %now.1;
@@ -393,7 +393,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_12
         lputv %hour.2 %tmp.10;
         symbol [ hour %hour.2 58 12 16 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 59 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %bg.3 = local;
         symbol [ bg %bg.3 59 12 14 ];
         symbol [ backgroundDayBitmap %tmp.12 59 17 36 ];
@@ -480,14 +480,14 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_67_15_70
 C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_67_15_70_8_stop:
 C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_65_8_70_8_if_end:
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 73 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %blockSize.4 = local;
         symbol [ blockSize %blockSize.4 73 12 21 ];
-        %tmp.45 = 120;
+        %tmp.45 = 100;
         lputv %blockSize.4 %tmp.45;
         symbol [ blockSize %blockSize.4 73 12 21 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 74 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %blockX.5 = local;
         symbol [ blockX %blockX.5 74 12 18 ];
         symbol [ screenWidth %tmp.47 74 22 33 ];
@@ -502,7 +502,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_65_8_70_
         lputv %blockX.5 %tmp.53;
         symbol [ blockX %blockX.5 74 12 18 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 75 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %blockY.6 = local;
         symbol [ blockY %blockY.6 75 12 18 ];
         %tmp.54 = 80;
@@ -601,7 +601,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_85_33_88
         goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_85_8_88_8_if_end;
 C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_85_8_88_8_if_end:
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 91 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %hourVal.9 = local;
         symbol [ hourVal %hourVal.9 91 12 19 ];
         %tmp.96 = lgetv %now.1;
@@ -611,7 +611,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_85_8_88_
         lputv %hourVal.9 %tmp.97;
         symbol [ hourVal %hourVal.9 91 12 19 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 92 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %minVal.10 = local;
         symbol [ minVal %minVal.10 92 12 18 ];
         %tmp.98 = lgetv %now.1;
@@ -621,7 +621,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_85_8_88_
         lputv %minVal.10 %tmp.99;
         symbol [ minVal %minVal.10 92 12 18 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 93 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %is24Hour.11 = local;
         symbol [ is24Hour %is24Hour.11 93 12 20 ];
         symbol [ System %tmp.100 93 23 29 ];
@@ -681,7 +681,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_94_23_96
         goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_94_8_96_8_if_end;
 C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_94_8_96_8_if_end:
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 97 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %hourStr.12 = local;
         symbol [ hourStr %hourStr.12 97 12 19 ];
         %tmp.116 = lgetv %hourVal.9;
@@ -693,7 +693,7 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_94_8_96_
         lputv %hourStr.12 %tmp.119;
         symbol [ hourStr %hourStr.12 97 12 19 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 98 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %minStr.13 = local;
         symbol [ minStr %minStr.13 98 12 18 ];
         %tmp.120 = lgetv %minVal.10;
@@ -704,420 +704,435 @@ C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_94_8_96_
         %tmp.123 = invoke %tmp.120 %tmp.121(%tmp.122);
         lputv %minStr.13 %tmp.123;
         symbol [ minStr %minStr.13 98 12 18 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 100 8 ]
-        %tmp.124 = lgetv %dc;
-        symbol [ dc %tmp.124 100 8 10 ];
-        symbol [ setColor %tmp.125 100 11 19 ];
-        %tmp.125 = getv function %tmp.124 :setColor;
-        symbol [ Graphics %tmp.126 100 20 28 ];
-        %tmp.126 = getm $.Toybox.Graphics;
-        symbol [ COLOR_YELLOW %tmp.127 100 29 41 ];
-        %tmp.127 = getv %tmp.126 :COLOR_YELLOW;
-        symbol [ Graphics %tmp.128 100 43 51 ];
-        %tmp.128 = getm $.Toybox.Graphics;
-        symbol [ COLOR_TRANSPARENT %tmp.129 100 52 69 ];
-        %tmp.129 = getv %tmp.128 :COLOR_TRANSPARENT;
-        invoke %tmp.124 %tmp.125(%tmp.127, %tmp.129);
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 102 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 103 8 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
         %textY.14 = local;
-        symbol [ textY %textY.14 102 12 17 ];
-        %tmp.130 = lgetv %blockY.6;
-        symbol [ blockY %tmp.130 102 20 26 ];
-        %tmp.131 = 1;
-        %tmp.132 = add %tmp.130 %tmp.131;
-        lputv %textY.14 %tmp.132;
-        symbol [ textY %textY.14 102 12 17 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 105 8 ]
-        %tmp.133 = lgetv %dc;
-        symbol [ dc %tmp.133 105 8 10 ];
-        symbol [ drawText %tmp.134 105 11 19 ];
-        %tmp.134 = getv function %tmp.133 :drawText;
-        %tmp.135 = lgetv %blockX.5;
-        symbol [ blockX %tmp.135 105 20 26 ];
-        %tmp.136 = lgetv %blockSize.4;
-        symbol [ blockSize %tmp.136 105 29 38 ];
-        %tmp.137 = 2;
-        %tmp.138 = div %tmp.136 %tmp.137;
-        %tmp.139 = add %tmp.135 %tmp.138;
-        %tmp.140 = lgetv %textY.14;
-        symbol [ textY %tmp.140 105 42 47 ];
-        symbol [ Graphics %tmp.141 105 49 57 ];
-        %tmp.141 = getm $.Toybox.Graphics;
-        symbol [ FONT_SYSTEM_NUMBER_MEDIUM %tmp.142 105 58 83 ];
-        %tmp.142 = getv %tmp.141 :FONT_SYSTEM_NUMBER_MEDIUM;
-        %tmp.143 = lgetv %hourStr.12;
-        symbol [ hourStr %tmp.143 105 85 92 ];
-        symbol [ Graphics %tmp.144 105 94 102 ];
-        %tmp.144 = getm $.Toybox.Graphics;
-        symbol [ TEXT_JUSTIFY_CENTER %tmp.145 105 103 122 ];
-        %tmp.145 = getv %tmp.144 :TEXT_JUSTIFY_CENTER;
-        invoke %tmp.133 %tmp.134(%tmp.139, %tmp.140, %tmp.142, %tmp.143, %tmp.145);
+        symbol [ textY %textY.14 103 12 17 ];
+        %tmp.124 = lgetv %blockY.6;
+        symbol [ blockY %tmp.124 103 20 26 ];
+        %tmp.125 = 30;
+        %tmp.126 = add %tmp.124 %tmp.125;
+        lputv %textY.14 %tmp.126;
+        symbol [ textY %textY.14 103 12 17 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 106 8 ]
-        %tmp.146 = lgetv %dc;
-        symbol [ dc %tmp.146 106 8 10 ];
-        symbol [ drawText %tmp.147 106 11 19 ];
-        %tmp.147 = getv function %tmp.146 :drawText;
-        %tmp.148 = lgetv %blockX.5;
-        symbol [ blockX %tmp.148 106 20 26 ];
-        %tmp.149 = lgetv %blockSize.4;
-        symbol [ blockSize %tmp.149 106 29 38 ];
-        %tmp.150 = add %tmp.148 %tmp.149;
-        %tmp.151 = lgetv %blockSize.4;
-        symbol [ blockSize %tmp.151 106 41 50 ];
-        %tmp.152 = 2;
-        %tmp.153 = div %tmp.151 %tmp.152;
-        %tmp.154 = add %tmp.150 %tmp.153;
-        %tmp.155 = lgetv %textY.14;
-        symbol [ textY %tmp.155 106 54 59 ];
-        symbol [ Graphics %tmp.156 106 61 69 ];
-        %tmp.156 = getm $.Toybox.Graphics;
-        symbol [ FONT_SYSTEM_NUMBER_MEDIUM %tmp.157 106 70 95 ];
-        %tmp.157 = getv %tmp.156 :FONT_SYSTEM_NUMBER_MEDIUM;
-        %tmp.158 = lgetv %minStr.13;
-        symbol [ minStr %tmp.158 106 97 103 ];
-        symbol [ Graphics %tmp.159 106 105 113 ];
-        %tmp.159 = getm $.Toybox.Graphics;
-        symbol [ TEXT_JUSTIFY_CENTER %tmp.160 106 114 133 ];
-        %tmp.160 = getv %tmp.159 :TEXT_JUSTIFY_CENTER;
-        invoke %tmp.146 %tmp.147(%tmp.154, %tmp.155, %tmp.157, %tmp.158, %tmp.160);
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
+        %timeFont.15 = local;
+        symbol [ timeFont %timeFont.15 106 12 20 ];
+        symbol [ WatchUi %tmp.127 106 23 30 ];
+        %tmp.127 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.128 106 31 43 ];
+        %tmp.128 = getv function %tmp.127 :loadResource;
+        symbol [ Rez %tmp.130 106 44 47 ];
+        %tmp.130 = getv ? :Rez;
+        symbol [ Fonts %tmp.131 106 48 53 ];
+        %tmp.131 = getv %tmp.130 :Fonts;
+        symbol [ pixel_font %tmp.132 106 54 64 ];
+        %tmp.132 = getv %tmp.131 :pixel_font;
+        %tmp.133 = invoke %tmp.127 %tmp.128(%tmp.132);
+        lputv %timeFont.15 %tmp.133;
+        symbol [ timeFont %timeFont.15 106 12 20 ];
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 109 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop" ]
-        %marioBitmap.15 = local;
-        symbol [ marioBitmap %marioBitmap.15 109 12 23 ];
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_begin:
-        symbol [ marioIsDown %tmp.162 109 26 37 ];
-        %tmp.162 = getv ? :marioIsDown;
-        bf %tmp.162 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_else_false;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_true:
-        symbol [ marioNormalBitmap %tmp.164 109 40 57 ];
-        %tmp.164 = getv ? :marioNormalBitmap;
-        push %tmp.164;
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_else_false:
-        symbol [ marioJumpBitmap %tmp.166 109 60 75 ];
-        %tmp.166 = getv ? :marioJumpBitmap;
-        push %tmp.166;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_end:
-        %tmp.167 = phi [%tmp.162 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_begin] [%tmp.164 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_true] [%tmp.166 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_else_false] [%tmp.167 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_109_26_109_60_end];
-        lputv %marioBitmap.15 %tmp.167;
-        symbol [ marioBitmap %marioBitmap.15 109 12 23 ];
+        %tmp.134 = lgetv %dc;
+        symbol [ dc %tmp.134 109 8 10 ];
+        symbol [ setColor %tmp.135 109 11 19 ];
+        %tmp.135 = getv function %tmp.134 :setColor;
+        %tmp.136 = 0x753A00;
+        symbol [ Graphics %tmp.137 109 30 38 ];
+        %tmp.137 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.138 109 39 56 ];
+        %tmp.138 = getv %tmp.137 :COLOR_TRANSPARENT;
+        invoke %tmp.134 %tmp.135(%tmp.136, %tmp.138);
 [ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 110 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_8_122_8_if_stmt:
-        %tmp.168 = lgetv %marioBitmap.15;
-        symbol [ marioBitmap %tmp.168 110 12 23 ];
-        %tmp.169 = null;
-        %tmp.170 = ne %tmp.168 %tmp.169;
-        bf %tmp.170 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_8_122_8_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_8_122_8_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 111 12 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_stop" ]
-        %marioX.16 = local;
-        symbol [ marioX %marioX.16 111 16 22 ];
-        symbol [ screenWidth %tmp.172 111 26 37 ];
-        %tmp.172 = getv ? :screenWidth;
-        %tmp.173 = 120;
-        %tmp.174 = sub %tmp.172 %tmp.173;
-        %tmp.175 = 2;
-        %tmp.176 = div %tmp.174 %tmp.175;
-        lputv %marioX.16 %tmp.176;
-        symbol [ marioX %marioX.16 111 16 22 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 112 12 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_stop" ]
-        %marioY.17 = local;
-        symbol [ marioY %marioY.17 112 16 22 ];
-        symbol [ screenHeight %tmp.178 112 25 37 ];
-        %tmp.178 = getv ? :screenHeight;
-        %tmp.179 = 160;
-        %tmp.180 = sub %tmp.178 %tmp.179;
-        lputv %marioY.17 %tmp.180;
-        symbol [ marioY %marioY.17 112 16 22 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 114 12 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_12_119_12_if_stmt:
-        symbol [ marioIsDown %tmp.182 114 17 28 ];
-        %tmp.182 = getv ? :marioIsDown;
-        %tmp.183 = not %tmp.182;
-        bf %tmp.183 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_12_119_12_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_12_119_12_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 115 16 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_stop" ]
-        %progress.18 = local;
-        symbol [ progress %progress.18 115 20 28 ];
-        %tmp.184 = self;
-        symbol [ getAnimationProgress %tmp.185 115 31 51 ];
-        %tmp.185 = getv function %tmp.184 :getAnimationProgress;
-        %tmp.186 = invoke %tmp.184 %tmp.185();
-        lputv %progress.18 %tmp.186;
-        symbol [ progress %progress.18 115 20 28 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 116 16 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_stop" ]
-        %jumpHeight.19 = local;
-        symbol [ jumpHeight %jumpHeight.19 116 20 30 ];
-        %tmp.187 = 80;
-        lputv %jumpHeight.19 %tmp.187;
-        symbol [ jumpHeight %jumpHeight.19 116 20 30 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 117 16 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_stop" ]
-        %offset.20 = local;
-        symbol [ offset %offset.20 117 20 26 ];
-        %tmp.188 = lgetv %jumpHeight.19;
-        symbol [ jumpHeight %tmp.188 117 30 40 ];
-        symbol [ Math %tmp.190 117 43 47 ];
-        %tmp.190 = getv ? :Math;
-        symbol [ sin %tmp.191 117 48 51 ];
-        %tmp.191 = getv function %tmp.190 :sin;
-        %tmp.192 = lgetv %progress.18;
-        symbol [ progress %tmp.192 117 52 60 ];
-        symbol [ Math %tmp.194 117 63 67 ];
-        %tmp.194 = getv ? :Math;
-        symbol [ PI %tmp.195 117 68 70 ];
-        %tmp.195 = getv %tmp.194 :PI;
-        %tmp.196 = mul %tmp.192 %tmp.195;
-        %tmp.197 = invoke %tmp.190 %tmp.191(%tmp.196);
-        %tmp.198 = mul %tmp.188 %tmp.197;
-        symbol [ toNumber %tmp.199 117 73 81 ];
-        %tmp.199 = getv function %tmp.198 :toNumber;
-        %tmp.200 = invoke %tmp.198 %tmp.199();
-        lputv %offset.20 %tmp.200;
-        symbol [ offset %offset.20 117 20 26 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 118 16 ]
-        %tmp.201 = lgetv %marioY.17;
-        symbol [ marioY %tmp.201 118 25 31 ];
-        %tmp.202 = lgetv %offset.20;
-        symbol [ offset %tmp.202 118 34 40 ];
-        %tmp.203 = sub %tmp.201 %tmp.202;
-        lputv %marioY.17 %tmp.203;
-        symbol [ marioY %marioY.17 118 16 22 ];
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_30_119_12_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_12_119_12_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_12_119_12_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 121 12 ]
-        %tmp.204 = lgetv %dc;
-        symbol [ dc %tmp.204 121 12 14 ];
-        symbol [ drawBitmap %tmp.205 121 15 25 ];
-        %tmp.205 = getv function %tmp.204 :drawBitmap;
-        %tmp.206 = lgetv %marioX.16;
-        symbol [ marioX %tmp.206 121 26 32 ];
-        %tmp.207 = lgetv %marioY.17;
-        symbol [ marioY %tmp.207 121 34 40 ];
-        %tmp.208 = lgetv %marioBitmap.15;
-        symbol [ marioBitmap %tmp.208 121 42 53 ];
-        %tmp.209 = as %tmp.208 { (!Null) };
-        invoke %tmp.204 %tmp.205(%tmp.206, %tmp.207, %tmp.209);
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_33_122_8_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_8_122_8_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_110_8_122_8_if_end:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_123_4_stop:
+        %tmp.139 = lgetv %dc;
+        symbol [ dc %tmp.139 110 8 10 ];
+        symbol [ drawText %tmp.140 110 11 19 ];
+        %tmp.140 = getv function %tmp.139 :drawText;
+        %tmp.141 = lgetv %blockX.5;
+        symbol [ blockX %tmp.141 110 20 26 ];
+        %tmp.142 = lgetv %blockSize.4;
+        symbol [ blockSize %tmp.142 110 29 38 ];
+        %tmp.143 = 2;
+        %tmp.144 = div %tmp.142 %tmp.143;
+        %tmp.145 = add %tmp.141 %tmp.144;
+        %tmp.146 = lgetv %textY.14;
+        symbol [ textY %tmp.146 110 42 47 ];
+        %tmp.147 = lgetv %timeFont.15;
+        symbol [ timeFont %tmp.147 110 49 57 ];
+        %tmp.148 = lgetv %hourStr.12;
+        symbol [ hourStr %tmp.148 110 59 66 ];
+        symbol [ Graphics %tmp.149 110 68 76 ];
+        %tmp.149 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.150 110 77 96 ];
+        %tmp.150 = getv %tmp.149 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.139 %tmp.140(%tmp.145, %tmp.146, %tmp.147, %tmp.148, %tmp.150);
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 111 8 ]
+        %tmp.151 = lgetv %dc;
+        symbol [ dc %tmp.151 111 8 10 ];
+        symbol [ drawText %tmp.152 111 11 19 ];
+        %tmp.152 = getv function %tmp.151 :drawText;
+        %tmp.153 = lgetv %blockX.5;
+        symbol [ blockX %tmp.153 111 20 26 ];
+        %tmp.154 = lgetv %blockSize.4;
+        symbol [ blockSize %tmp.154 111 29 38 ];
+        %tmp.155 = add %tmp.153 %tmp.154;
+        %tmp.156 = lgetv %blockSize.4;
+        symbol [ blockSize %tmp.156 111 41 50 ];
+        %tmp.157 = 2;
+        %tmp.158 = div %tmp.156 %tmp.157;
+        %tmp.159 = add %tmp.155 %tmp.158;
+        %tmp.160 = lgetv %textY.14;
+        symbol [ textY %tmp.160 111 54 59 ];
+        %tmp.161 = lgetv %timeFont.15;
+        symbol [ timeFont %tmp.161 111 61 69 ];
+        %tmp.162 = lgetv %minStr.13;
+        symbol [ minStr %tmp.162 111 71 77 ];
+        symbol [ Graphics %tmp.163 111 79 87 ];
+        %tmp.163 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.164 111 88 107 ];
+        %tmp.164 = getv %tmp.163 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.151 %tmp.152(%tmp.159, %tmp.160, %tmp.161, %tmp.162, %tmp.164);
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 114 8 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop" ]
+        %marioBitmap.16 = local;
+        symbol [ marioBitmap %marioBitmap.16 114 12 23 ];
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_begin:
+        symbol [ marioIsDown %tmp.166 114 26 37 ];
+        %tmp.166 = getv ? :marioIsDown;
+        bf %tmp.166 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_else_false;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_true:
+        symbol [ marioNormalBitmap %tmp.168 114 40 57 ];
+        %tmp.168 = getv ? :marioNormalBitmap;
+        push %tmp.168;
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_else_false:
+        symbol [ marioJumpBitmap %tmp.170 114 60 75 ];
+        %tmp.170 = getv ? :marioJumpBitmap;
+        push %tmp.170;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_end:
+        %tmp.171 = phi [%tmp.166 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_begin] [%tmp.168 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_true] [%tmp.170 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_else_false] [%tmp.171 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_114_26_114_60_end];
+        lputv %marioBitmap.16 %tmp.171;
+        symbol [ marioBitmap %marioBitmap.16 114 12 23 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 115 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_8_128_8_if_stmt:
+        %tmp.172 = lgetv %marioBitmap.16;
+        symbol [ marioBitmap %tmp.172 115 12 23 ];
+        %tmp.173 = null;
+        %tmp.174 = ne %tmp.172 %tmp.173;
+        bf %tmp.174 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_8_128_8_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_8_128_8_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 116 12 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_stop" ]
+        %marioX.17 = local;
+        symbol [ marioX %marioX.17 116 16 22 ];
+        symbol [ screenWidth %tmp.176 116 26 37 ];
+        %tmp.176 = getv ? :screenWidth;
+        %tmp.177 = 120;
+        %tmp.178 = sub %tmp.176 %tmp.177;
+        %tmp.179 = 2;
+        %tmp.180 = div %tmp.178 %tmp.179;
+        lputv %marioX.17 %tmp.180;
+        symbol [ marioX %marioX.17 116 16 22 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 118 12 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_stop" ]
+        %marioY.18 = local;
+        symbol [ marioY %marioY.18 118 16 22 ];
+        %tmp.181 = 253;
+        %tmp.182 = 120;
+        %tmp.183 = sub %tmp.181 %tmp.182;
+        %tmp.184 = 20;
+        %tmp.185 = add %tmp.183 %tmp.184;
+        lputv %marioY.18 %tmp.185;
+        symbol [ marioY %marioY.18 118 16 22 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 120 12 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_12_125_12_if_stmt:
+        symbol [ marioIsDown %tmp.187 120 17 28 ];
+        %tmp.187 = getv ? :marioIsDown;
+        %tmp.188 = not %tmp.187;
+        bf %tmp.188 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_12_125_12_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_12_125_12_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 121 16 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_stop" ]
+        %progress.19 = local;
+        symbol [ progress %progress.19 121 20 28 ];
+        %tmp.189 = self;
+        symbol [ getAnimationProgress %tmp.190 121 31 51 ];
+        %tmp.190 = getv function %tmp.189 :getAnimationProgress;
+        %tmp.191 = invoke %tmp.189 %tmp.190();
+        lputv %progress.19 %tmp.191;
+        symbol [ progress %progress.19 121 20 28 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 122 16 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_stop" ]
+        %jumpHeight.20 = local;
+        symbol [ jumpHeight %jumpHeight.20 122 20 30 ];
+        %tmp.192 = 60;
+        lputv %jumpHeight.20 %tmp.192;
+        symbol [ jumpHeight %jumpHeight.20 122 20 30 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 123 16 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_stop" ]
+        %offset.21 = local;
+        symbol [ offset %offset.21 123 20 26 ];
+        %tmp.193 = lgetv %jumpHeight.20;
+        symbol [ jumpHeight %tmp.193 123 30 40 ];
+        symbol [ Math %tmp.195 123 43 47 ];
+        %tmp.195 = getv ? :Math;
+        symbol [ sin %tmp.196 123 48 51 ];
+        %tmp.196 = getv function %tmp.195 :sin;
+        %tmp.197 = lgetv %progress.19;
+        symbol [ progress %tmp.197 123 52 60 ];
+        symbol [ Math %tmp.199 123 63 67 ];
+        %tmp.199 = getv ? :Math;
+        symbol [ PI %tmp.200 123 68 70 ];
+        %tmp.200 = getv %tmp.199 :PI;
+        %tmp.201 = mul %tmp.197 %tmp.200;
+        %tmp.202 = invoke %tmp.195 %tmp.196(%tmp.201);
+        %tmp.203 = mul %tmp.193 %tmp.202;
+        symbol [ toNumber %tmp.204 123 73 81 ];
+        %tmp.204 = getv function %tmp.203 :toNumber;
+        %tmp.205 = invoke %tmp.203 %tmp.204();
+        lputv %offset.21 %tmp.205;
+        symbol [ offset %offset.21 123 20 26 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 124 16 ]
+        %tmp.206 = lgetv %marioY.18;
+        symbol [ marioY %tmp.206 124 25 31 ];
+        %tmp.207 = lgetv %offset.21;
+        symbol [ offset %tmp.207 124 34 40 ];
+        %tmp.208 = sub %tmp.206 %tmp.207;
+        lputv %marioY.18 %tmp.208;
+        symbol [ marioY %marioY.18 124 16 22 ];
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_30_125_12_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_12_125_12_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_120_12_125_12_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 127 12 ]
+        %tmp.209 = lgetv %dc;
+        symbol [ dc %tmp.209 127 12 14 ];
+        symbol [ drawBitmap %tmp.210 127 15 25 ];
+        %tmp.210 = getv function %tmp.209 :drawBitmap;
+        %tmp.211 = lgetv %marioX.17;
+        symbol [ marioX %tmp.211 127 26 32 ];
+        %tmp.212 = lgetv %marioY.18;
+        symbol [ marioY %tmp.212 127 34 40 ];
+        %tmp.213 = lgetv %marioBitmap.16;
+        symbol [ marioBitmap %tmp.213 127 42 53 ];
+        %tmp.214 = as %tmp.213 { (!Null) };
+        invoke %tmp.209 %tmp.210(%tmp.211, %tmp.212, %tmp.214);
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_33_128_8_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_8_128_8_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_115_8_128_8_if_end:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_55_26_129_4_stop:
     }
-    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 125; @symbol_functiondef = [getAnimationProgress,125,13,33]; ]
+    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 131; @symbol_functiondef = [getAnimationProgress,131,13,33]; ]
     function getAnimationProgress() {
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_125_36_130_4_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 126 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_8_126_51_if_stmt:
-        symbol [ animationStartTime %tmp.2 126 12 30 ];
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_131_36_136_4_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 132 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_8_132_51_if_stmt:
+        symbol [ animationStartTime %tmp.2 132 12 30 ];
         %tmp.2 = getv ? :animationStartTime;
         %tmp.3 = 0;
         %tmp.4 = eq %tmp.2 %tmp.3;
-        bf %tmp.4 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_8_126_51_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_8_126_51_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_37_126_51_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 126 39 ]
+        bf %tmp.4 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_8_132_51_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_8_132_51_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_37_132_51_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 132 39 ]
         %tmp.5 = 0.0;
         ret %tmp.5;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_37_126_51_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_8_126_51_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_126_8_126_51_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 127 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_125_36_130_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_125_36_130_4_stop" ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_37_132_51_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_8_132_51_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_8_132_51_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 133 8 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_131_36_136_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_131_36_136_4_stop" ]
         %elapsed.1 = local;
-        symbol [ elapsed %elapsed.1 127 12 19 ];
-        symbol [ System %tmp.6 127 22 28 ];
+        symbol [ elapsed %elapsed.1 133 12 19 ];
+        symbol [ System %tmp.6 133 22 28 ];
         %tmp.6 = getm $.Toybox.System;
-        symbol [ getTimer %tmp.7 127 29 37 ];
+        symbol [ getTimer %tmp.7 133 29 37 ];
         %tmp.7 = getv function %tmp.6 :getTimer;
         %tmp.8 = invoke %tmp.6 %tmp.7();
-        symbol [ animationStartTime %tmp.10 127 42 60 ];
+        symbol [ animationStartTime %tmp.10 133 42 60 ];
         %tmp.10 = getv ? :animationStartTime;
         %tmp.11 = sub %tmp.8 %tmp.10;
         lputv %elapsed.1 %tmp.11;
-        symbol [ elapsed %elapsed.1 127 12 19 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 128 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_8_128_56_if_stmt:
+        symbol [ elapsed %elapsed.1 133 12 19 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 134 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_8_134_56_if_stmt:
         %tmp.12 = lgetv %elapsed.1;
-        symbol [ elapsed %tmp.12 128 12 19 ];
-        symbol [ animationDuration %tmp.14 128 23 40 ];
+        symbol [ elapsed %tmp.12 134 12 19 ];
+        symbol [ animationDuration %tmp.14 134 23 40 ];
         %tmp.14 = getv ? :animationDuration;
         %tmp.15 = gte %tmp.12 %tmp.14;
-        bf %tmp.15 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_8_128_56_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_8_128_56_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_42_128_56_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 128 44 ]
+        bf %tmp.15 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_8_134_56_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_8_134_56_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_42_134_56_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 134 44 ]
         %tmp.16 = 1.0;
         ret %tmp.16;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_42_128_56_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_8_128_56_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_128_8_128_56_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 129 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_42_134_56_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_8_134_56_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_134_8_134_56_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 135 8 ]
         %tmp.17 = lgetv %elapsed.1;
-        symbol [ elapsed %tmp.17 129 15 22 ];
-        symbol [ toFloat %tmp.18 129 23 30 ];
+        symbol [ elapsed %tmp.17 135 15 22 ];
+        symbol [ toFloat %tmp.18 135 23 30 ];
         %tmp.18 = getv function %tmp.17 :toFloat;
         %tmp.19 = invoke %tmp.17 %tmp.18();
-        symbol [ animationDuration %tmp.21 129 35 52 ];
+        symbol [ animationDuration %tmp.21 135 35 52 ];
         %tmp.21 = getv ? :animationDuration;
-        symbol [ toFloat %tmp.22 129 53 60 ];
+        symbol [ toFloat %tmp.22 135 53 60 ];
         %tmp.22 = getv function %tmp.21 :toFloat;
         %tmp.23 = invoke %tmp.21 %tmp.22();
         %tmp.24 = div %tmp.19 %tmp.23;
         ret %tmp.24;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_125_36_130_4_stop:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_131_36_136_4_stop:
     }
-    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 132; @symbol_functiondef = [startMarioJump,132,13,27]; ]
+    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 138; @symbol_functiondef = [startMarioJump,138,13,27]; ]
     function startMarioJump() {
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_30_139_4_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 133 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_8_133_36_if_stmt:
-        symbol [ marioIsDown %tmp.2 133 13 24 ];
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_138_30_145_4_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 139 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_8_139_36_if_stmt:
+        symbol [ marioIsDown %tmp.2 139 13 24 ];
         %tmp.2 = getv ? :marioIsDown;
         %tmp.3 = not %tmp.2;
-        bf %tmp.3 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_8_133_36_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_8_133_36_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_26_133_36_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 133 28 ]
+        bf %tmp.3 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_8_139_36_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_8_139_36_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_26_139_36_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 139 28 ]
         ret ?;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_26_133_36_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_8_133_36_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_133_8_133_36_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 134 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_26_139_36_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_8_139_36_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_139_8_139_36_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 140 8 ]
         %tmp.4 = false;
-        symbol [ marioIsDown ? 134 8 19 ];
+        symbol [ marioIsDown ? 140 8 19 ];
         putv self :marioIsDown %tmp.4;
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 135 8 ]
-        symbol [ System %tmp.5 135 29 35 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 141 8 ]
+        symbol [ System %tmp.5 141 29 35 ];
         %tmp.5 = getm $.Toybox.System;
-        symbol [ getTimer %tmp.6 135 36 44 ];
+        symbol [ getTimer %tmp.6 141 36 44 ];
         %tmp.6 = getv function %tmp.5 :getTimer;
         %tmp.7 = invoke %tmp.5 %tmp.6();
-        symbol [ animationStartTime ? 135 8 26 ];
+        symbol [ animationStartTime ? 141 8 26 ];
         putv self :animationStartTime %tmp.7;
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 136 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_8_136_64_if_stmt:
-        symbol [ jumpTimer %tmp.9 136 12 21 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 142 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_8_142_64_if_stmt:
+        symbol [ jumpTimer %tmp.9 142 12 21 ];
         %tmp.9 = getv ? :jumpTimer;
         %tmp.10 = null;
         %tmp.11 = eq %tmp.9 %tmp.10;
-        bf %tmp.11 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_8_136_64_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_8_136_64_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_31_136_64_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 136 33 ]
-        symbol [ Timer %tmp.14 136 49 54 ];
+        bf %tmp.11 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_8_142_64_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_8_142_64_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_31_142_64_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 142 33 ]
+        symbol [ Timer %tmp.14 142 49 54 ];
         %tmp.14 = getm $.Toybox.Timer;
-        symbol [ Timer %tmp.15 136 55 60 ];
+        symbol [ Timer %tmp.15 142 55 60 ];
         %tmp.15 = getv function ? %tmp.14 :Timer;
         %tmp.12 = newc %tmp.15 ();
-        symbol [ jumpTimer ? 136 33 42 ];
+        symbol [ jumpTimer ? 142 33 42 ];
         putv self :jumpTimer %tmp.12;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_31_136_64_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_8_136_64_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_136_8_136_64_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 137 8 ]
-        symbol [ jumpTimer %tmp.17 137 8 17 ];
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_31_142_64_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_8_142_64_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_142_8_142_64_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 143 8 ]
+        symbol [ jumpTimer %tmp.17 143 8 17 ];
         %tmp.17 = getv ? :jumpTimer;
-        symbol [ start %tmp.18 137 18 23 ];
+        symbol [ start %tmp.18 143 18 23 ];
         %tmp.18 = getv function %tmp.17 :start;
         %tmp.19 = self;
-        symbol [ method %tmp.20 137 24 30 ];
+        symbol [ method %tmp.20 143 24 30 ];
         %tmp.20 = getv function %tmp.19 :method;
         %tmp.22 = const :onJumpUpdate;
-        symbol [ onJumpUpdate %tmp.22 137 32 44 const ];
+        symbol [ onJumpUpdate %tmp.22 143 32 44 const ];
         %tmp.23 = invoke %tmp.19 %tmp.20(%tmp.22);
         %tmp.24 = 33;
         %tmp.25 = true;
         invoke %tmp.17 %tmp.18(%tmp.23, %tmp.24, %tmp.25);
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 138 8 ]
-        symbol [ WatchUi %tmp.26 138 8 15 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 144 8 ]
+        symbol [ WatchUi %tmp.26 144 8 15 ];
         %tmp.26 = getm $.Toybox.WatchUi;
-        symbol [ requestUpdate %tmp.27 138 16 29 ];
+        symbol [ requestUpdate %tmp.27 144 16 29 ];
         %tmp.27 = getv function %tmp.26 :requestUpdate;
         invoke %tmp.26 %tmp.27();
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_132_30_139_4_stop:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_138_30_145_4_stop:
     }
-    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 141; @symbol_functiondef = [onJumpUpdate,141,13,25]; ]
+    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 147; @symbol_functiondef = [onJumpUpdate,147,13,25]; ]
     function onJumpUpdate() {
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_141_28_149_4_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 142 8 ]
-        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_141_28_149_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_141_28_149_4_stop" ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_147_28_158_4_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 148 8 ]
+        [ "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_147_28_158_4_start" "C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_147_28_158_4_stop" ]
         %elapsed.1 = local;
-        symbol [ elapsed %elapsed.1 142 12 19 ];
-        symbol [ System %tmp.1 142 22 28 ];
+        symbol [ elapsed %elapsed.1 148 12 19 ];
+        symbol [ System %tmp.1 148 22 28 ];
         %tmp.1 = getm $.Toybox.System;
-        symbol [ getTimer %tmp.2 142 29 37 ];
+        symbol [ getTimer %tmp.2 148 29 37 ];
         %tmp.2 = getv function %tmp.1 :getTimer;
         %tmp.3 = invoke %tmp.1 %tmp.2();
-        symbol [ animationStartTime %tmp.5 142 42 60 ];
+        symbol [ animationStartTime %tmp.5 148 42 60 ];
         %tmp.5 = getv ? :animationStartTime;
         %tmp.6 = sub %tmp.3 %tmp.5;
         lputv %elapsed.1 %tmp.6;
-        symbol [ elapsed %elapsed.1 142 12 19 ];
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 143 8 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_8_147_8_if_stmt:
+        symbol [ elapsed %elapsed.1 148 12 19 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 149 8 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_8_156_8_if_stmt:
         %tmp.7 = lgetv %elapsed.1;
-        symbol [ elapsed %tmp.7 143 12 19 ];
-        symbol [ animationDuration %tmp.9 143 23 40 ];
+        symbol [ elapsed %tmp.7 149 12 19 ];
+        symbol [ animationDuration %tmp.9 149 23 40 ];
         %tmp.9 = getv ? :animationDuration;
         %tmp.10 = gte %tmp.7 %tmp.9;
-        bf %tmp.10 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_8_147_8_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_8_147_8_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_42_147_8_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 144 12 ]
+        bf %tmp.10 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_8_156_8_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_8_156_8_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_42_156_8_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 150 12 ]
         %tmp.11 = true;
-        symbol [ marioIsDown ? 144 12 23 ];
+        symbol [ marioIsDown ? 150 12 23 ];
         putv self :marioIsDown %tmp.11;
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 145 12 ]
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 151 12 ]
         %tmp.12 = 0;
-        symbol [ animationStartTime ? 145 12 30 ];
+        symbol [ animationStartTime ? 151 12 30 ];
         putv self :animationStartTime %tmp.12;
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 146 12 ]
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_12_146_55_if_stmt:
-        symbol [ jumpTimer %tmp.14 146 16 25 ];
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 152 12 ]
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_12_155_12_if_stmt:
+        symbol [ jumpTimer %tmp.14 152 16 25 ];
         %tmp.14 = getv ? :jumpTimer;
         %tmp.15 = null;
         %tmp.16 = ne %tmp.14 %tmp.15;
-        bf %tmp.16 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_12_146_55_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_12_146_55_if_true:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_35_146_55_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 146 37 ]
-        symbol [ jumpTimer %tmp.18 146 37 46 ];
+        bf %tmp.16 @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_12_155_12_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_12_155_12_if_true:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_35_155_12_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 153 16 ]
+        symbol [ jumpTimer %tmp.18 153 16 25 ];
         %tmp.18 = getv ? :jumpTimer;
         %tmp.19 = as %tmp.18 { (!Null) };
-        symbol [ stop %tmp.20 146 47 51 ];
+        symbol [ stop %tmp.20 153 26 30 ];
         %tmp.20 = getv function %tmp.19 :stop;
         invoke %tmp.19 %tmp.20();
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_35_146_55_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_12_146_55_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_146_12_146_55_if_end:
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_42_147_8_stop:
-        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_8_147_8_if_end;
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_143_8_147_8_if_end:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 148 8 ]
-        symbol [ WatchUi %tmp.21 148 8 15 ];
-        %tmp.21 = getm $.Toybox.WatchUi;
-        symbol [ requestUpdate %tmp.22 148 16 29 ];
-        %tmp.22 = getv function %tmp.21 :requestUpdate;
-        invoke %tmp.21 %tmp.22();
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_141_28_149_4_stop:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 154 16 ]
+        %tmp.21 = null;
+        symbol [ jumpTimer ? 154 16 25 ];
+        putv self :jumpTimer %tmp.21;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_35_155_12_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_12_155_12_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_152_12_155_12_if_end:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_42_156_8_stop:
+        goto @C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_8_156_8_if_end;
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_149_8_156_8_if_end:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 157 8 ]
+        symbol [ WatchUi %tmp.22 157 8 15 ];
+        %tmp.22 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.23 157 16 29 ];
+        %tmp.23 = getv function %tmp.22 :requestUpdate;
+        invoke %tmp.22 %tmp.23();
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_147_28_158_4_stop:
     }
-    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 151; @symbol_functiondef = [onPartialUpdate,151,13,28]; @symbol_param<0> = [dc,151,29,31]; ]
-    function onPartialUpdate(dc) {
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_151_33_153_4_start:
-[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 152 8 ]
+    [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 161; @symbol_functiondef = [onMinuteChanged,161,13,28]; ]
+    function onMinuteChanged() {
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_161_31_163_4_start:
+[ "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc" 162 8 ]
         %tmp.1 = self;
-        symbol [ startMarioJump %tmp.2 152 8 22 ];
+        symbol [ startMarioJump %tmp.2 162 8 22 ];
         %tmp.2 = getv function %tmp.1 :startMarioJump;
         invoke %tmp.1 %tmp.2();
-C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_151_33_153_4_stop:
+C__home_garmin_watchface_garmin_mario_time_color_source_MarioTimeApp_mc_161_31_163_4_stop:
     }
 }
 [ @file = "C:\home\garmin\watchface\garmin-mario-time-color\source\MarioTimeApp.mc"; @line = 1; ]

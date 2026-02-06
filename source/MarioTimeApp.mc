@@ -69,8 +69,8 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.fillRectangle(0, 0, screenWidth, screenHeight);
         }
 
-        // Calculate block positions (blocks are now 120x120)
-        var blockSize = 120;
+        // Calculate block positions (blocks are 100x100)
+        var blockSize = 100;
         var blockX = (screenWidth - blockSize * 2) / 2;
         var blockY = 80;
 
@@ -97,23 +97,29 @@ class MarioTimeView extends WatchUi.WatchFace {
         var hourStr = hourVal.format("%d");
         var minStr = minVal.format("%02d");
 
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-        // Calculate visual center of block
-        var textY = blockY + 1;
+        // Draw time in blocks using custom pixel font
+        // Font height is 49px, block is 100px
+        // Current font Y: 119-156, need to move up to center in block (78-175)
+        var textY = blockY + 30;  // Move up by 10px
+        
+        // Load custom pixel font
+        var timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font);
+        
+        // Original project uses brown color rgb(117, 58, 0)
+        dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(blockX + blockSize/2, textY, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + blockSize + blockSize/2, textY, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Use medium font that fits in 120x120 block
-        dc.drawText(blockX + blockSize/2, textY, Graphics.FONT_SYSTEM_NUMBER_MEDIUM, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(blockX + blockSize + blockSize/2, textY, Graphics.FONT_SYSTEM_NUMBER_MEDIUM, minStr, Graphics.TEXT_JUSTIFY_CENTER);
-
-        // Draw Mario (now 120x120)
+        // Draw Mario (120x120)
         var marioBitmap = marioIsDown ? marioNormalBitmap : marioJumpBitmap;
         if (marioBitmap != null) {
             var marioX = (screenWidth - 120) / 2;
-            var marioY = screenHeight - 160;
+            // Position Mario below blocks (block bottom is ~175, Mario head at ~253)
+            var marioY = 253 - 120 + 20;  // Adjust so head is at Y=253 when not jumping
 
             if (!marioIsDown) {
                 var progress = getAnimationProgress();
-                var jumpHeight = 80;
+                var jumpHeight = 60;
                 var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
                 marioY = marioY - offset;
             }
@@ -143,12 +149,16 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (elapsed >= animationDuration) {
             marioIsDown = true;
             animationStartTime = 0;
-            if (jumpTimer != null) { jumpTimer.stop(); }
+            if (jumpTimer != null) {
+                jumpTimer.stop();
+                jumpTimer = null;
+            }
         }
         WatchUi.requestUpdate();
     }
 
-    function onPartialUpdate(dc) {
+    // Called every minute when time changes
+    function onMinuteChanged() {
         startMarioJump();
     }
 }
