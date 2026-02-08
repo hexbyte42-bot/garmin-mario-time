@@ -72,15 +72,34 @@ class MarioTimeView extends WatchUi.WatchFace {
         try { backgroundUndergroundBitmap = WatchUi.loadResource(Rez.Drawables.background_underground); } catch (e) { backgroundUndergroundBitmap = null; }
         try { backgroundCastleBitmap = WatchUi.loadResource(Rez.Drawables.background_castle); } catch (e) { backgroundCastleBitmap = null; }
 
-        // Load settings
-        loadSettings();
+        // Initialize settings with defaults
+        selectedCharacter = 0;
+        selectedBackground = 0;
 
         return;
     }
 
     function loadSettings() {
-        selectedCharacter = WatchUi.getConfigurationValue(Properties.character, 0).toNumber();
-        selectedBackground = WatchUi.getConfigurationValue(Properties.background, 0).toNumber();
+        // In ConnectIQ, settings values are loaded through the configuration system
+        // The actual values are accessible during runtime
+        // Using defaults initially, will be updated when settings are applied
+        selectedCharacter = 0; // Default to Mario
+        selectedBackground = 0; // Default to Auto
+    }
+    
+    // Settings callback - this is called when settings are updated
+    function onSettingsChanged() {
+        try {
+            selectedCharacter = Rez.ConfigValues.character;
+        } catch(e) {
+            selectedCharacter = 0;
+        }
+        try {
+            selectedBackground = Rez.ConfigValues.background;
+        } catch(e) {
+            selectedBackground = 0;
+        }
+        WatchUi.requestUpdate();
     }
 
     function onUpdate(dc) {
