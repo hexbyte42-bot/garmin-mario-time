@@ -8,6 +8,9 @@ using Toybox.Timer;
 using Toybox.Lang;
 using Toybox.BluetoothLowEnergy;
 using Toybox.Sensor;
+using Toybox.ActivityMonitor;
+using Toybox.SensorHistory;
+using Toybox.UserProfile;
 
 // Properties for settings
 class Properties {
@@ -245,14 +248,48 @@ class MarioTimeView extends WatchUi.WatchFace {
     function drawFitnessMetrics(dc, now) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         
-        // Top: Battery level (static placeholder - actual value would come from system)
-        var batteryLevel = "100%"; // Placeholder value
+        // Top: Battery level
+        var batteryLevel = "--";
+        try {
+            var stats = System.getSystemStats();
+            if (stats != null && stats.battery != null) {
+                batteryLevel = stats.battery.format("%d") + "%";
+            }
+        } catch(e) {
+            // Fallback if system stats not available
+        }
         
-        // Left side: Steps count (static placeholder - actual value would come from system)
-        var steps = "5432"; // Placeholder value
+        // Left side: Steps count
+        var steps = "--";
+        try {
+            var activityInfo = ActivityMonitor.getInfo();
+            if (activityInfo != null && activityInfo.steps != null) {
+                steps = activityInfo.steps.format("%d");
+            }
+        } catch(e) {
+            // Fallback if activity monitor not available
+        }
         
-        // Right side: Heart rate (static placeholder - actual value would come from system)
-        var heartRate = "72"; // Placeholder value
+        // Right side: Heart rate
+        var heartRate = "--";
+        try {
+            // Check if heart rate data is available in the activity info
+            if (Activity.Info has :currentHeartRate) {
+                var activityInfo = Activity.getActivityInfo();
+                if (activityInfo != null && activityInfo.currentHeartRate != null && activityInfo.currentHeartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                    heartRate = activityInfo.currentHeartRate.format("%d");
+                }
+            }
+            // If not available in activity info, try to get from history
+            if (heartRate == "--" && ActivityMonitor has :getHeartRateHistory) {
+                var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next(); // Try to get latest entry from the last minute
+                if (hrHistory != null && hrHistory.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                    heartRate = hrHistory.heartRate.format("%d");
+                }
+            }
+        } catch(e) {
+            // Fallback if heart rate not available
+        }
         
         // Draw battery at the top center
         dc.drawText(screenWidth / 2, 20, Graphics.FONT_TINY, "BAT: " + batteryLevel, Graphics.TEXT_JUSTIFY_CENTER);
