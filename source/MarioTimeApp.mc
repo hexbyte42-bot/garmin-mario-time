@@ -222,17 +222,27 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onJumpUpdate() {
         var elapsed = System.getTimer() - animationStartTime;
         if (elapsed >= animationDuration) {
+            // Animation completed - ensure proper state
             marioIsDown = true;
-            animationStartTime = 0;
+            
+            // Stop the timer first to prevent further callbacks
             if (jumpTimer != null) {
                 jumpTimer.stop();
                 jumpTimer = null;
             }
+            
+            // Reset the animation start time
+            animationStartTime = 0;
+            
+            // Request immediate update to ensure the display shows the normal character state
+            WatchUi.requestUpdate();
+        } else {
+            // Continue animation updates
+            WatchUi.requestUpdate();
         }
-        WatchUi.requestUpdate();
     }
 
-    // Handle partial updates to ensure smooth animation
+    // Handle partial updates to ensure smooth animation and proper state transitions
     function onPartialUpdate(dc) {
         if (!marioIsDown) {
             WatchUi.requestUpdate();
