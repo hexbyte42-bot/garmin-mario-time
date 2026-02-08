@@ -160,12 +160,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         dc.drawText(blockX + blockSize/2, textY, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(blockX + blockSize + blockSize/2, textY, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Draw date at the top of the screen
-        var dateStr = (now.month + 1).format("%02d") + "/" + now.day.format("%02d"); // MM/DD format
-        var dateFont = dc.getFont(Graphics.FONT_XTINY);
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth / 2, 10, dateFont, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
-
         // Draw selected character (120x120)
         var characterBitmap = getCurrentCharacterBitmap();
         if (characterBitmap != null) {
