@@ -53,6 +53,12 @@ class MarioTimeView extends WatchUi.WatchFace {
     var screenHeight = 0;
     var lastMinute = -1;
     
+    // Variables for optimizing sensor readings
+    var lastHrUpdate = 0;
+    var cachedHeartRate = 0;
+    var hasCachedHeartRate = false;
+    var hrUpdateInterval = 30000; // Update heart rate every 30 seconds
+    
     // Settings variables
     var selectedCharacter = 0;  // 0=Mario, 1=Luigi, 2=Bowser
     var selectedBackground = 0; // 0=Auto, 1=Day, 2=Night, 3=Underground, 4=Castle
@@ -290,29 +296,40 @@ class MarioTimeView extends WatchUi.WatchFace {
             // Fallback if activity monitor not available
         }
         
-        // Right side: Heart rate with icon
+        // Right side: Heart rate with icon (optimized reading)
+        var currentTime = System.getTimer();
         var heartRate = 0;
         var hasHeartRate = false;
-        try {
-            // Check if heart rate data is available in the activity info
-            if (Activity.Info has :currentHeartRate) {
-                var activityInfo = Activity.getActivityInfo();
-                if (activityInfo != null && activityInfo.currentHeartRate != null && activityInfo.currentHeartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
-                    heartRate = activityInfo.currentHeartRate;
-                    hasHeartRate = true;
+        
+        // Update heart rate data only periodically to save battery
+        if (currentTime - lastHrUpdate > hrUpdateInterval) {
+            try {
+                // Check if heart rate data is available in the activity info
+                if (Activity.Info has :currentHeartRate) {
+                    var activityInfo = Activity.getActivityInfo();
+                    if (activityInfo != null && activityInfo.currentHeartRate != null && activityInfo.currentHeartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                        cachedHeartRate = activityInfo.currentHeartRate;
+                        hasCachedHeartRate = true;
+                        lastHrUpdate = currentTime;
+                    }
                 }
-            }
-            // If not available in activity info, try to get from history
-            if (!hasHeartRate && ActivityMonitor has :getHeartRateHistory) {
-                var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next(); // Try to get latest entry from the last minute
-                if (hrHistory != null && hrHistory.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
-                    heartRate = hrHistory.heartRate;
-                    hasHeartRate = true;
+                // If not available in activity info, try to get from history
+                if (!hasCachedHeartRate && ActivityMonitor has :getHeartRateHistory) {
+                    var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next(); // Try to get latest entry from the last minute
+                    if (hrHistory != null && hrHistory.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                        cachedHeartRate = hrHistory.heartRate;
+                        hasCachedHeartRate = true;
+                        lastHrUpdate = currentTime;
+                    }
                 }
+            } catch(e) {
+                // Fallback if heart rate not available
             }
-        } catch(e) {
-            // Fallback if heart rate not available
         }
+        
+        // Use cached values
+        heartRate = cachedHeartRate;
+        hasHeartRate = hasCachedHeartRate;
         
         // Draw battery icon at the top center
         var batteryFont = null;
@@ -326,7 +343,7 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.drawText(screenWidth / 2, 15, batteryFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
         }
         
-        // Draw steps icon at 9 o'clock position (left side, middle height)
+        // Draw steps icon at 9 o'clock position (left side, middle height) - icon on top, data below
         var stepsFont = null;
         try {
             stepsFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
@@ -335,14 +352,14 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         if (stepsFont != null) {
-            dc.drawText(20, screenHeight / 2, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps at left side
+            dc.drawText(20, screenHeight / 2 - 10, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps icon on top
         }
         
-        // Draw steps count next to icon
+        // Draw steps count below the icon
         var stepsText = hasSteps ? steps.format("%d") : "--";
-        dc.drawText(45, screenHeight / 2 + 5, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, screenHeight / 2 + 15, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
-        // Draw heart rate icon at 3 o'clock position (right side, middle height)
+        // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
         var hrFont = null;
         try {
             hrFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
@@ -351,11 +368,11 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         if (hrFont != null) {
-            dc.drawText(screenWidth - 40, screenHeight / 2, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse at right side
+            dc.drawText(screenWidth - 40, screenHeight / 2 - 10, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
         }
         
-        // Draw heart rate value next to icon
+        // Draw heart rate value below the icon
         var hrText = hasHeartRate ? heartRate.format("%d") : "--";
-        dc.drawText(screenWidth - 65, screenHeight / 2 + 5, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(screenWidth - 40, screenHeight / 2 + 15, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
