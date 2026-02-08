@@ -7,6 +7,12 @@ using Toybox.Time.Gregorian;
 using Toybox.Timer;
 using Toybox.Lang;
 
+// Properties for settings
+class Properties {
+    static const character = 1;
+    static const background = 2;
+}
+
 class MarioTimeApp extends Application.AppBase {
     function initialize() {
         AppBase.initialize();
@@ -23,6 +29,10 @@ class MarioTimeApp extends Application.AppBase {
 class MarioTimeView extends WatchUi.WatchFace {
     var marioNormalBitmap;
     var marioJumpBitmap;
+    var luigiNormalBitmap;
+    var luigiJumpBitmap;
+    var bowserNormalBitmap;
+    var bowserJumpBitmap;
     var blockBitmap;
     var backgroundDayBitmap;
     var backgroundNightBitmap;
@@ -37,6 +47,10 @@ class MarioTimeView extends WatchUi.WatchFace {
     var screenWidth = 0;
     var screenHeight = 0;
     var lastMinute = -1;
+    
+    // Settings variables
+    var selectedCharacter = 0;  // 0=Mario, 1=Luigi, 2=Bowser
+    var selectedBackground = 0; // 0=Auto, 1=Day, 2=Night, 3=Underground, 4=Castle
 
     function initialize() {
         WatchFace.initialize();
@@ -48,13 +62,25 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         try { marioNormalBitmap = WatchUi.loadResource(Rez.Drawables.mario_normal); } catch (e) { marioNormalBitmap = null; }
         try { marioJumpBitmap = WatchUi.loadResource(Rez.Drawables.mario_jump); } catch (e) { marioJumpBitmap = null; }
+        try { luigiNormalBitmap = WatchUi.loadResource(Rez.Drawables.luigi_normal); } catch (e) { luigiNormalBitmap = null; }
+        try { luigiJumpBitmap = WatchUi.loadResource(Rez.Drawables.luigi_jump); } catch (e) { luigiJumpBitmap = null; }
+        try { bowserNormalBitmap = WatchUi.loadResource(Rez.Drawables.bowser_normal); } catch (e) { bowserNormalBitmap = null; }
+        try { bowserJumpBitmap = WatchUi.loadResource(Rez.Drawables.bowser_jump); } catch (e) { bowserJumpBitmap = null; }
         try { blockBitmap = WatchUi.loadResource(Rez.Drawables.block); } catch (e) { blockBitmap = null; }
         try { backgroundDayBitmap = WatchUi.loadResource(Rez.Drawables.background_day); } catch (e) { backgroundDayBitmap = null; }
         try { backgroundNightBitmap = WatchUi.loadResource(Rez.Drawables.background_night); } catch (e) { backgroundNightBitmap = null; }
         try { backgroundUndergroundBitmap = WatchUi.loadResource(Rez.Drawables.background_underground); } catch (e) { backgroundUndergroundBitmap = null; }
         try { backgroundCastleBitmap = WatchUi.loadResource(Rez.Drawables.background_castle); } catch (e) { backgroundCastleBitmap = null; }
 
+        // Load settings
+        loadSettings();
+
         return;
+    }
+
+    function loadSettings() {
+        selectedCharacter = WatchUi.getConfigurationValue(Properties.character, 0).toNumber();
+        selectedBackground = WatchUi.getConfigurationValue(Properties.background, 0).toNumber();
     }
 
     function onUpdate(dc) {
@@ -66,18 +92,27 @@ class MarioTimeView extends WatchUi.WatchFace {
             startMarioJump();
         }
 
-        // Draw background (now 416x416, fills the screen)
+        // Draw background based on settings
         var hour = now.hour;
         var bg = backgroundDayBitmap;
 
-        // Enhanced background switching logic
-        if (hour >= 22 || hour < 6) {
-            bg = backgroundNightBitmap;
-        } else if (hour >= 6 && hour < 12) {
+        if (selectedBackground == 0) { // Auto mode
+            if (hour >= 22 || hour < 6) {
+                bg = backgroundNightBitmap;
+            } else if (hour >= 6 && hour < 12) {
+                bg = backgroundDayBitmap;
+            } else if (hour >= 12 && hour < 18) {
+                bg = backgroundUndergroundBitmap;
+            } else {
+                bg = backgroundCastleBitmap;
+            }
+        } else if (selectedBackground == 1) { // Day
             bg = backgroundDayBitmap;
-        } else if (hour >= 12 && hour < 18) {
+        } else if (selectedBackground == 2) { // Night
+            bg = backgroundNightBitmap;
+        } else if (selectedBackground == 3) { // Underground
             bg = backgroundUndergroundBitmap;
-        } else {
+        } else if (selectedBackground == 4) { // Castle
             bg = backgroundCastleBitmap;
         }
 
@@ -93,7 +128,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         var blockX = (screenWidth - blockSize * 2) / 2;
         var blockY = 80;
 
-        // Animate blocks when Mario jumps
+        // Animate blocks when character jumps
         if (!marioIsDown) {
             var progress = getAnimationProgress();
             var bounceHeight = 15;
@@ -117,31 +152,46 @@ class MarioTimeView extends WatchUi.WatchFace {
         var minStr = minVal.format("%02d");
 
         // Draw time in blocks using custom pixel font
-        var textY = blockY + 30;  // Center text in block
-        
-        // Load custom pixel font
         var timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font);
+        var textY = blockY + 30;  // Center text in block
         
         // Original project uses brown color rgb(117, 58, 0)
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
         dc.drawText(blockX + blockSize/2, textY, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(blockX + blockSize + blockSize/2, textY, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Draw Mario (120x120)
-        var marioBitmap = marioIsDown ? marioNormalBitmap : marioJumpBitmap;
-        if (marioBitmap != null) {
-            var marioX = (screenWidth - 120) / 2;
-            // Position Mario on the ground (ground at Y=375, Mario height=120)
-            var marioY = 375 - 120;  // Mario stands on ground at Y=375
+        // Draw date at the top of the screen
+        var dateStr = (now.month + 1).format("%02d") + "/" + now.day.format("%02d"); // MM/DD format
+        var dateFont = dc.getFont(Graphics.FONT_XTINY);
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(screenWidth / 2, 10, dateFont, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Draw selected character (120x120)
+        var characterBitmap = getCurrentCharacterBitmap();
+        if (characterBitmap != null) {
+            var charX = (screenWidth - 120) / 2;
+            // Position character on the ground (ground at Y=375, character height=120)
+            var charY = 375 - 120;  // Character stands on ground at Y=375
 
             if (!marioIsDown) {
                 var progress = getAnimationProgress();
                 var jumpHeight = 60;
                 var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
-                marioY = marioY - offset;  // Jump upward (negative offset)
+                charY = charY - offset;  // Jump upward (negative offset)
             }
 
-            dc.drawBitmap(marioX, marioY, marioBitmap);
+            dc.drawBitmap(charX, charY, characterBitmap);
+        }
+    }
+
+    function getCurrentCharacterBitmap() {
+        var isJumping = !marioIsDown;
+        if (selectedCharacter == 1) { // Luigi
+            return isJumping ? luigiJumpBitmap : luigiNormalBitmap;
+        } else if (selectedCharacter == 2) { // Bowser
+            return isJumping ? bowserJumpBitmap : bowserNormalBitmap;
+        } else { // Mario (default)
+            return isJumping ? marioJumpBitmap : marioNormalBitmap;
         }
     }
 
@@ -181,5 +231,11 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (!marioIsDown) {
             WatchUi.requestUpdate();
         }
+    }
+    
+    // Override to handle settings changes
+    function onSettingsChanged() {
+        loadSettings();
+        WatchUi.requestUpdate();
     }
 }
