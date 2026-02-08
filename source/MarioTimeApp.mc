@@ -6,6 +6,8 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Timer;
 using Toybox.Lang;
+using Toybox.BluetoothLowEnergy;
+using Toybox.Sensor;
 
 // Properties for settings
 class Properties {
@@ -180,6 +182,9 @@ class MarioTimeView extends WatchUi.WatchFace {
 
             dc.drawBitmap(charX, charY, characterBitmap);
         }
+        
+        // Draw fitness metrics (heart rate, steps, battery)
+        drawFitnessMetrics(dc, now);
     }
 
     function getCurrentCharacterBitmap() {
@@ -235,5 +240,30 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onSettingsChanged() {
         loadSettings();
         WatchUi.requestUpdate();
+    }
+    
+    function drawFitnessMetrics(dc, now) {
+        // Draw fitness metrics at the bottom of the screen
+        var metricsY = 390; // Position near bottom
+        var metricSpacing = 80; // Space between metrics
+        var startX = 30; // Starting X position
+        
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        
+        // Note: Direct sensor access is limited in watch faces
+        // These metrics would typically be provided by complications or system UI
+        // For demonstration purposes, showing placeholders
+        var heartRate = "--";
+        var steps = "--";
+        var batteryLevel = "--";
+        
+        // Draw heart rate (would be populated by complication)
+        dc.drawText(startX, metricsY, Graphics.FONT_TINY, "HR: " + heartRate, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Draw steps (would be populated by complication)
+        dc.drawText(startX + metricSpacing * 1.5, metricsY, Graphics.FONT_TINY, "ST: " + steps, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Draw battery (would be populated by system)
+        dc.drawText(startX + metricSpacing * 3, metricsY, Graphics.FONT_TINY, "BAT: " + batteryLevel, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
