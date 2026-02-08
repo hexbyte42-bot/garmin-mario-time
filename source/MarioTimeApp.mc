@@ -183,7 +183,7 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.drawBitmap(charX, charY, characterBitmap);
         }
         
-        // Draw fitness metrics (heart rate, steps, battery)
+        // Draw fitness metrics (battery, steps, heart rate)
         drawFitnessMetrics(dc, now);
     }
 
@@ -243,27 +243,24 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
     
     function drawFitnessMetrics(dc, now) {
-        // Draw fitness metrics at the bottom of the screen
-        var metricsY = 390; // Position near bottom
-        var metricSpacing = 80; // Space between metrics
-        var startX = 30; // Starting X position
-        
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         
-        // Note: Direct sensor access is limited in watch faces
-        // These metrics would typically be provided by complications or system UI
-        // For demonstration purposes, showing placeholders
-        var heartRate = "--";
-        var steps = "--";
-        var batteryLevel = "--";
+        // Top: Battery level (static placeholder - actual value would come from system)
+        var batteryLevel = "100%"; // Placeholder value
         
-        // Draw heart rate (would be populated by complication)
-        dc.drawText(startX, metricsY, Graphics.FONT_TINY, "HR: " + heartRate, Graphics.TEXT_JUSTIFY_LEFT);
+        // Left side: Steps count (static placeholder - actual value would come from system)
+        var steps = "5432"; // Placeholder value
         
-        // Draw steps (would be populated by complication)
-        dc.drawText(startX + metricSpacing * 1.5, metricsY, Graphics.FONT_TINY, "ST: " + steps, Graphics.TEXT_JUSTIFY_LEFT);
+        // Right side: Heart rate (static placeholder - actual value would come from system)
+        var heartRate = "72"; // Placeholder value
         
-        // Draw battery (would be populated by system)
-        dc.drawText(startX + metricSpacing * 3, metricsY, Graphics.FONT_TINY, "BAT: " + batteryLevel, Graphics.TEXT_JUSTIFY_LEFT);
+        // Draw battery at the top center
+        dc.drawText(screenWidth / 2, 20, Graphics.FONT_TINY, "BAT: " + batteryLevel, Graphics.TEXT_JUSTIFY_CENTER);
+        
+        // Draw steps on the left side
+        dc.drawText(20, screenHeight - 30, Graphics.FONT_TINY, "ST: " + steps, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Draw heart rate on the right side
+        dc.drawText(screenWidth - 20, screenHeight - 30, Graphics.FONT_TINY, "HR: " + heartRate, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
