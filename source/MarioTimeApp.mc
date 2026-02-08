@@ -337,7 +337,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         
         // Draw steps count below the icon
         var stepsText = hasSteps ? steps.format("%d") : "--";
-        dc.drawText(20, screenHeight / 2 + 5, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, screenHeight / 2 + 5, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
         // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
         var hrFont = null;
@@ -353,6 +353,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         
         // Draw heart rate value below the icon
         var hrText = hasHeartRate ? heartRate.format("%d") : "--";
-        dc.drawText(screenWidth - 20, screenHeight / 2 + 5, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(screenWidth - 20, screenHeight / 2 + 5, Graphics.FONT_XTINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
