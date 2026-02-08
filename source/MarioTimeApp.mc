@@ -248,7 +248,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     function drawFitnessMetrics(dc, now) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         
-        // Top: Battery level
+        // Top: Battery level (as percentage with simple indicator)
         var batteryLevel = "--";
         try {
             var stats = System.getSystemStats();
@@ -291,13 +291,15 @@ class MarioTimeView extends WatchUi.WatchFace {
             // Fallback if heart rate not available
         }
         
-        // Draw battery at the top center
-        dc.drawText(screenWidth / 2, 20, Graphics.FONT_TINY, "BAT: " + batteryLevel, Graphics.TEXT_JUSTIFY_CENTER);
+        // Draw battery at the top center (simple indicator)
+        dc.drawText(screenWidth / 2, 15, Graphics.FONT_TINY, batteryLevel, Graphics.TEXT_JUSTIFY_CENTER);
         
-        // Draw steps on the left side
-        dc.drawText(20, screenHeight - 30, Graphics.FONT_TINY, "ST: " + steps, Graphics.TEXT_JUSTIFY_LEFT);
+        // Draw steps indicator and count on the left side
+        dc.drawText(15, screenHeight - 35, Graphics.FONT_TINY, "S:", Graphics.TEXT_JUSTIFY_LEFT); // Simple steps indicator
+        dc.drawText(35, screenHeight - 35, Graphics.FONT_TINY, steps, Graphics.TEXT_JUSTIFY_LEFT);
         
-        // Draw heart rate on the right side
-        dc.drawText(screenWidth - 20, screenHeight - 30, Graphics.FONT_TINY, "HR: " + heartRate, Graphics.TEXT_JUSTIFY_RIGHT);
+        // Draw heart rate indicator and count on the right side
+        dc.drawText(screenWidth - 45, screenHeight - 35, Graphics.FONT_TINY, "HR:", Graphics.TEXT_JUSTIFY_RIGHT); // Simple heart rate indicator
+        dc.drawText(screenWidth - 15, screenHeight - 35, Graphics.FONT_TINY, heartRate, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
