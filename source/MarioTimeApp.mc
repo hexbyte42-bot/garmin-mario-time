@@ -86,13 +86,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         selectedCharacter = 0; // Default to Mario
         selectedBackground = 0; // Default to Auto
     }
-    
-    // Settings callback - this is called when settings are updated
-    function onSettingsChanged() {
-        // Settings are handled by the ConnectIQ framework
-        // Currently using defaults; full implementation requires proper SDK setup
-        WatchUi.requestUpdate();
-    }
 
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
