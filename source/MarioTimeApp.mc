@@ -248,58 +248,114 @@ class MarioTimeView extends WatchUi.WatchFace {
     function drawFitnessMetrics(dc, now) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         
-        // Top: Battery level (as percentage with simple indicator)
-        var batteryLevel = "--";
+        // Top: Battery icon only (no text, just icon indicating battery level)
+        var batteryLevel = 0;
         try {
             var stats = System.getSystemStats();
             if (stats != null && stats.battery != null) {
-                batteryLevel = stats.battery.format("%d") + "%";
+                batteryLevel = stats.battery;
             }
         } catch(e) {
             // Fallback if system stats not available
         }
         
-        // Left side: Steps count
-        var steps = "--";
+        // Determine battery icon based on level
+        var batteryIcon = "m"; // default medium battery
+        if (batteryLevel >= 90) {
+            batteryIcon = "h"; // high battery
+        } else if (batteryLevel < 20) {
+            batteryIcon = "k"; // low battery
+        }
+        
+        // Check if charging (try to get charging status separately)
+        try {
+            var stats = System.getSystemStats();
+            if (stats.charging) {
+                batteryIcon = "l"; // charging icon
+            }
+        } catch(e) {
+            // Ignore if charging status not available
+        }
+        
+        // Left side: Steps count with icon
+        var steps = 0;
+        var hasSteps = false;
         try {
             var activityInfo = ActivityMonitor.getInfo();
             if (activityInfo != null && activityInfo.steps != null) {
-                steps = activityInfo.steps.format("%d");
+                steps = activityInfo.steps;
+                hasSteps = true;
             }
         } catch(e) {
             // Fallback if activity monitor not available
         }
         
-        // Right side: Heart rate
-        var heartRate = "--";
+        // Right side: Heart rate with icon
+        var heartRate = 0;
+        var hasHeartRate = false;
         try {
             // Check if heart rate data is available in the activity info
             if (Activity.Info has :currentHeartRate) {
                 var activityInfo = Activity.getActivityInfo();
                 if (activityInfo != null && activityInfo.currentHeartRate != null && activityInfo.currentHeartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
-                    heartRate = activityInfo.currentHeartRate.format("%d");
+                    heartRate = activityInfo.currentHeartRate;
+                    hasHeartRate = true;
                 }
             }
             // If not available in activity info, try to get from history
-            if (heartRate == "--" && ActivityMonitor has :getHeartRateHistory) {
+            if (!hasHeartRate && ActivityMonitor has :getHeartRateHistory) {
                 var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next(); // Try to get latest entry from the last minute
                 if (hrHistory != null && hrHistory.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
-                    heartRate = hrHistory.heartRate.format("%d");
+                    heartRate = hrHistory.heartRate;
+                    hasHeartRate = true;
                 }
             }
         } catch(e) {
             // Fallback if heart rate not available
         }
         
-        // Draw battery at the top center (simple indicator)
-        dc.drawText(screenWidth / 2, 15, Graphics.FONT_TINY, batteryLevel, Graphics.TEXT_JUSTIFY_CENTER);
+        // Draw battery icon at the top center
+        var batteryFont = null;
+        try {
+            batteryFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
         
-        // Draw steps indicator and count on the left side
-        dc.drawText(15, screenHeight - 35, Graphics.FONT_TINY, "S:", Graphics.TEXT_JUSTIFY_LEFT); // Simple steps indicator
-        dc.drawText(35, screenHeight - 35, Graphics.FONT_TINY, steps, Graphics.TEXT_JUSTIFY_LEFT);
+        if (batteryFont != null) {
+            dc.drawText(screenWidth / 2, 15, batteryFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        }
         
-        // Draw heart rate indicator and count on the right side
-        dc.drawText(screenWidth - 45, screenHeight - 35, Graphics.FONT_TINY, "HR:", Graphics.TEXT_JUSTIFY_RIGHT); // Simple heart rate indicator
-        dc.drawText(screenWidth - 15, screenHeight - 35, Graphics.FONT_TINY, heartRate, Graphics.TEXT_JUSTIFY_RIGHT);
+        // Draw steps icon on the left side
+        var stepsFont = null;
+        try {
+            stepsFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
+        
+        if (stepsFont != null) {
+            dc.drawText(20, screenHeight - 35, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps
+        }
+        
+        // Draw steps count next to icon
+        var stepsText = hasSteps ? steps.format("%d") : "--";
+        dc.drawText(45, screenHeight - 30, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Draw heart rate icon on the right side
+        var hrFont = null;
+        try {
+            hrFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
+        
+        if (hrFont != null) {
+            dc.drawText(screenWidth - 40, screenHeight - 35, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse
+        }
+        
+        // Draw heart rate value next to icon
+        var hrText = hasHeartRate ? heartRate.format("%d") : "--";
+        dc.drawText(screenWidth - 65, screenHeight - 30, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
