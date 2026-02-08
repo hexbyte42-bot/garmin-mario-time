@@ -6,6 +6,17 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Timer;
 using Toybox.Lang;
+using Toybox.BluetoothLowEnergy;
+using Toybox.Sensor;
+using Toybox.ActivityMonitor;
+using Toybox.SensorHistory;
+using Toybox.UserProfile;
+
+// Properties for settings
+class Properties {
+    static const character = 1;
+    static const background = 2;
+}
 
 class MarioTimeApp extends Application.AppBase {
     function initialize() {
@@ -23,6 +34,10 @@ class MarioTimeApp extends Application.AppBase {
 class MarioTimeView extends WatchUi.WatchFace {
     var marioNormalBitmap;
     var marioJumpBitmap;
+    var luigiNormalBitmap;
+    var luigiJumpBitmap;
+    var bowserNormalBitmap;
+    var bowserJumpBitmap;
     var blockBitmap;
     var backgroundDayBitmap;
     var backgroundNightBitmap;
@@ -37,6 +52,10 @@ class MarioTimeView extends WatchUi.WatchFace {
     var screenWidth = 0;
     var screenHeight = 0;
     var lastMinute = -1;
+    
+    // Settings variables
+    var selectedCharacter = 0;  // 0=Mario, 1=Luigi, 2=Bowser
+    var selectedBackground = 0; // 0=Auto, 1=Day, 2=Night, 3=Underground, 4=Castle
 
     function initialize() {
         WatchFace.initialize();
@@ -48,13 +67,29 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         try { marioNormalBitmap = WatchUi.loadResource(Rez.Drawables.mario_normal); } catch (e) { marioNormalBitmap = null; }
         try { marioJumpBitmap = WatchUi.loadResource(Rez.Drawables.mario_jump); } catch (e) { marioJumpBitmap = null; }
+        try { luigiNormalBitmap = WatchUi.loadResource(Rez.Drawables.luigi_normal); } catch (e) { luigiNormalBitmap = null; }
+        try { luigiJumpBitmap = WatchUi.loadResource(Rez.Drawables.luigi_jump); } catch (e) { luigiJumpBitmap = null; }
+        try { bowserNormalBitmap = WatchUi.loadResource(Rez.Drawables.bowser_normal); } catch (e) { bowserNormalBitmap = null; }
+        try { bowserJumpBitmap = WatchUi.loadResource(Rez.Drawables.bowser_jump); } catch (e) { bowserJumpBitmap = null; }
         try { blockBitmap = WatchUi.loadResource(Rez.Drawables.block); } catch (e) { blockBitmap = null; }
         try { backgroundDayBitmap = WatchUi.loadResource(Rez.Drawables.background_day); } catch (e) { backgroundDayBitmap = null; }
         try { backgroundNightBitmap = WatchUi.loadResource(Rez.Drawables.background_night); } catch (e) { backgroundNightBitmap = null; }
         try { backgroundUndergroundBitmap = WatchUi.loadResource(Rez.Drawables.background_underground); } catch (e) { backgroundUndergroundBitmap = null; }
         try { backgroundCastleBitmap = WatchUi.loadResource(Rez.Drawables.background_castle); } catch (e) { backgroundCastleBitmap = null; }
 
+        // Initialize settings with defaults
+        selectedCharacter = 0;
+        selectedBackground = 0;
+
         return;
+    }
+
+    function loadSettings() {
+        // In ConnectIQ, settings values are loaded through the configuration system
+        // The actual values are accessible during runtime
+        // Using defaults initially, will be updated when settings are applied
+        selectedCharacter = 0; // Default to Mario
+        selectedBackground = 0; // Default to Auto
     }
 
     function onUpdate(dc) {
@@ -66,18 +101,27 @@ class MarioTimeView extends WatchUi.WatchFace {
             startMarioJump();
         }
 
-        // Draw background (now 416x416, fills the screen)
+        // Draw background based on settings
         var hour = now.hour;
         var bg = backgroundDayBitmap;
 
-        // Enhanced background switching logic
-        if (hour >= 22 || hour < 6) {
-            bg = backgroundNightBitmap;
-        } else if (hour >= 6 && hour < 12) {
+        if (selectedBackground == 0) { // Auto mode
+            if (hour >= 22 || hour < 6) {
+                bg = backgroundNightBitmap;
+            } else if (hour >= 6 && hour < 12) {
+                bg = backgroundDayBitmap;
+            } else if (hour >= 12 && hour < 18) {
+                bg = backgroundUndergroundBitmap;
+            } else {
+                bg = backgroundCastleBitmap;
+            }
+        } else if (selectedBackground == 1) { // Day
             bg = backgroundDayBitmap;
-        } else if (hour >= 12 && hour < 18) {
+        } else if (selectedBackground == 2) { // Night
+            bg = backgroundNightBitmap;
+        } else if (selectedBackground == 3) { // Underground
             bg = backgroundUndergroundBitmap;
-        } else {
+        } else if (selectedBackground == 4) { // Castle
             bg = backgroundCastleBitmap;
         }
 
@@ -93,7 +137,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         var blockX = (screenWidth - blockSize * 2) / 2;
         var blockY = 80;
 
-        // Animate blocks when Mario jumps
+        // Animate blocks when character jumps
         if (!marioIsDown) {
             var progress = getAnimationProgress();
             var bounceHeight = 15;
@@ -117,31 +161,43 @@ class MarioTimeView extends WatchUi.WatchFace {
         var minStr = minVal.format("%02d");
 
         // Draw time in blocks using custom pixel font
-        var textY = blockY + 30;  // Center text in block
-        
-        // Load custom pixel font
         var timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font);
+        var textY = blockY + 30;  // Center text in block
         
         // Original project uses brown color rgb(117, 58, 0)
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
         dc.drawText(blockX + blockSize/2, textY, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(blockX + blockSize + blockSize/2, textY, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Draw Mario (120x120)
-        var marioBitmap = marioIsDown ? marioNormalBitmap : marioJumpBitmap;
-        if (marioBitmap != null) {
-            var marioX = (screenWidth - 120) / 2;
-            // Position Mario on the ground (ground at Y=375, Mario height=120)
-            var marioY = 375 - 120;  // Mario stands on ground at Y=375
+        // Draw selected character (120x120)
+        var characterBitmap = getCurrentCharacterBitmap();
+        if (characterBitmap != null) {
+            var charX = (screenWidth - 120) / 2;
+            // Position character on the ground (ground at Y=375, character height=120)
+            var charY = 375 - 120;  // Character stands on ground at Y=375
 
             if (!marioIsDown) {
                 var progress = getAnimationProgress();
                 var jumpHeight = 60;
                 var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
-                marioY = marioY - offset;  // Jump upward (negative offset)
+                charY = charY - offset;  // Jump upward (negative offset)
             }
 
-            dc.drawBitmap(marioX, marioY, marioBitmap);
+            dc.drawBitmap(charX, charY, characterBitmap);
+        }
+        
+        // Draw fitness metrics (battery, steps, heart rate)
+        drawFitnessMetrics(dc, now);
+    }
+
+    function getCurrentCharacterBitmap() {
+        var isJumping = !marioIsDown;
+        if (selectedCharacter == 1) { // Luigi
+            return isJumping ? luigiJumpBitmap : luigiNormalBitmap;
+        } else if (selectedCharacter == 2) { // Bowser
+            return isJumping ? bowserJumpBitmap : bowserNormalBitmap;
+        } else { // Mario (default)
+            return isJumping ? marioJumpBitmap : marioNormalBitmap;
         }
     }
 
@@ -166,20 +222,155 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onJumpUpdate() {
         var elapsed = System.getTimer() - animationStartTime;
         if (elapsed >= animationDuration) {
+            // Animation completed - ensure proper state
             marioIsDown = true;
-            animationStartTime = 0;
+            
+            // Stop the timer first to prevent further callbacks
             if (jumpTimer != null) {
                 jumpTimer.stop();
                 jumpTimer = null;
             }
+            
+            // Reset the animation start time
+            animationStartTime = 0;
+            
+            // Request immediate update to ensure the display shows the normal character state
+            WatchUi.requestUpdate();
+        } else {
+            // Continue animation updates
+            WatchUi.requestUpdate();
         }
-        WatchUi.requestUpdate();
     }
 
-    // Handle partial updates to ensure smooth animation
+    // Handle partial updates to ensure smooth animation and proper state transitions
     function onPartialUpdate(dc) {
         if (!marioIsDown) {
             WatchUi.requestUpdate();
         }
+    }
+    
+    // Override to handle settings changes
+    function onSettingsChanged() {
+        loadSettings();
+        WatchUi.requestUpdate();
+    }
+    
+    function drawFitnessMetrics(dc, now) {
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        
+        // Top: Battery icon only (no text, just icon indicating battery level)
+        var batteryLevel = 0;
+        try {
+            var stats = System.getSystemStats();
+            if (stats != null && stats.battery != null) {
+                batteryLevel = stats.battery;
+            }
+        } catch(e) {
+            // Fallback if system stats not available
+        }
+        
+        // Determine battery icon based on level
+        var batteryIcon = "m"; // default medium battery
+        if (batteryLevel >= 90) {
+            batteryIcon = "h"; // high battery
+        } else if (batteryLevel < 20) {
+            batteryIcon = "k"; // low battery
+        }
+        
+        // Check if charging (try to get charging status separately)
+        try {
+            var stats = System.getSystemStats();
+            if (stats.charging) {
+                batteryIcon = "l"; // charging icon
+            }
+        } catch(e) {
+            // Ignore if charging status not available
+        }
+        
+        // Left side: Steps count with icon
+        var steps = 0;
+        var hasSteps = false;
+        try {
+            var activityInfo = ActivityMonitor.getInfo();
+            if (activityInfo != null && activityInfo.steps != null) {
+                steps = activityInfo.steps;
+                hasSteps = true;
+            }
+        } catch(e) {
+            // Fallback if activity monitor not available
+        }
+        
+        // Right side: Heart rate with icon (following reference project approach)
+        var heartRate = 0;
+        var hasHeartRate = false;
+        
+        // Check if heart rate data is available in the activity info
+        if (Activity.Info has :currentHeartRate) {
+            var activityInfo = Activity.getActivityInfo();
+            if (activityInfo != null && activityInfo.currentHeartRate != null && activityInfo.currentHeartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                heartRate = activityInfo.currentHeartRate;
+                hasHeartRate = true;
+            }
+        }
+        // If not available in activity info, try to get from history
+        if (!hasHeartRate && ActivityMonitor has :getHeartRateHistory) {
+            var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next(); // Try to get latest entry from the last minute
+            if (hrHistory != null && hrHistory.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                heartRate = hrHistory.heartRate;
+                hasHeartRate = true;
+            }
+        }
+        
+        // Draw battery icon at the top center
+        var batteryFont = null;
+        try {
+            batteryFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
+        
+        if (batteryFont != null) {
+            dc.drawText(screenWidth / 2, 15, batteryFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+        
+        // Draw steps icon at 9 o'clock position (left side, middle height) - icon on top, data below
+        var stepsFont = null;
+        try {
+            stepsFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
+        
+        if (stepsFont != null) {
+            dc.drawText(20, screenHeight / 2 - 25, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps icon on top
+        }
+        
+        // Draw steps count below the icon, centered under the icon
+        var stepsText = hasSteps ? steps.format("%d") : "--";
+        var stepsTextWidth = dc.getTextWidthInPixels(stepsText, Graphics.FONT_XTINY);
+        // Center the text under the icon at 9 o'clock position, with increased spacing
+        // Approximate center of icon "s" when drawn at x=20
+        var stepsCenterX = 30; // Approximate center of icon
+        dc.drawText(stepsCenterX - stepsTextWidth / 2, screenHeight / 2 + 15, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
+        var hrFont = null;
+        try {
+            hrFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
+        } catch(e) {
+            // Icons font not available, skip drawing icon
+        }
+        
+        if (hrFont != null) {
+            dc.drawText(screenWidth - 20, screenHeight / 2 - 25, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
+        }
+        
+        // Draw heart rate value below the icon, centered under the icon
+        var hrText = hasHeartRate ? heartRate.format("%d") : "--";
+        var hrTextWidth = dc.getTextWidthInPixels(hrText, Graphics.FONT_XTINY);
+        // Center the text under the heart rate icon at 3 o'clock position, with increased spacing
+        // Approximate center of icon "p" when drawn at x=screenWidth-20
+        var hrCenterX = screenWidth - 30; // Approximate center of icon
+        dc.drawText(hrCenterX - hrTextWidth / 2, screenHeight / 2 + 15, Graphics.FONT_XTINY, hrText, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
