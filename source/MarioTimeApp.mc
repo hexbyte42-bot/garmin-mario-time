@@ -89,16 +89,8 @@ class MarioTimeView extends WatchUi.WatchFace {
     
     // Settings callback - this is called when settings are updated
     function onSettingsChanged() {
-        try {
-            selectedCharacter = Rez.ConfigValues.character;
-        } catch(e) {
-            selectedCharacter = 0;
-        }
-        try {
-            selectedBackground = Rez.ConfigValues.background;
-        } catch(e) {
-            selectedBackground = 0;
-        }
+        // Settings are handled by the ConnectIQ framework
+        // Currently using defaults; full implementation requires proper SDK setup
         WatchUi.requestUpdate();
     }
 
