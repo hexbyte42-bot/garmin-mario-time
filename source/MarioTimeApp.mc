@@ -348,11 +348,11 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         if (hrFont != null) {
-            dc.drawText(screenWidth - 40, screenHeight / 2 - 25, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
+            dc.drawText(screenWidth - 20, screenHeight / 2 - 25, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
         }
         
         // Draw heart rate value below the icon
         var hrText = hasHeartRate ? heartRate.format("%d") : "--";
-        dc.drawText(screenWidth - 40, screenHeight / 2 + 5, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(screenWidth - 20, screenHeight / 2 + 5, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
