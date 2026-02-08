@@ -1,0 +1,26 @@
+# Build outputs
+/bin/
+*.prg
+*.prg.debug.xml
+*.debug.xml
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Generated files
+/gen/
+/mir/
+/external-mir/
+
+# Scaled resources (can be regenerated)
+/resources_scaled/
