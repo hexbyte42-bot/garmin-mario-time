@@ -326,7 +326,7 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.drawText(screenWidth / 2, 15, batteryFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
         }
         
-        // Draw steps icon on the left side
+        // Draw steps icon at 9 o'clock position (left side, middle height)
         var stepsFont = null;
         try {
             stepsFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
@@ -335,14 +335,14 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         if (stepsFont != null) {
-            dc.drawText(20, screenHeight - 35, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps
+            dc.drawText(20, screenHeight / 2, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps at left side
         }
         
         // Draw steps count next to icon
         var stepsText = hasSteps ? steps.format("%d") : "--";
-        dc.drawText(45, screenHeight - 30, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(45, screenHeight / 2 + 5, Graphics.FONT_TINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
-        // Draw heart rate icon on the right side
+        // Draw heart rate icon at 3 o'clock position (right side, middle height)
         var hrFont = null;
         try {
             hrFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
@@ -351,11 +351,11 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         if (hrFont != null) {
-            dc.drawText(screenWidth - 40, screenHeight - 35, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse
+            dc.drawText(screenWidth - 40, screenHeight / 2, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse at right side
         }
         
         // Draw heart rate value next to icon
         var hrText = hasHeartRate ? heartRate.format("%d") : "--";
-        dc.drawText(screenWidth - 65, screenHeight - 30, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(screenWidth - 65, screenHeight / 2 + 5, Graphics.FONT_TINY, hrText, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 }
