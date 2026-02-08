@@ -338,8 +338,10 @@ class MarioTimeView extends WatchUi.WatchFace {
         // Draw steps count below the icon, centered under the icon
         var stepsText = hasSteps ? steps.format("%d") : "--";
         var stepsTextWidth = dc.getTextWidthInPixels(stepsText, Graphics.FONT_XTINY);
-        // Center the text under the icon which is drawn at x=20
-        dc.drawText(20 + (20 - stepsTextWidth) / 2, screenHeight / 2 + 5, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        // Center the text under the icon at 9 o'clock position, with increased spacing
+        // Approximate center of icon "s" when drawn at x=20
+        var stepsCenterX = 30; // Approximate center of icon
+        dc.drawText(stepsCenterX - stepsTextWidth / 2, screenHeight / 2 + 15, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
         // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
         var hrFont = null;
@@ -356,7 +358,9 @@ class MarioTimeView extends WatchUi.WatchFace {
         // Draw heart rate value below the icon, centered under the icon
         var hrText = hasHeartRate ? heartRate.format("%d") : "--";
         var hrTextWidth = dc.getTextWidthInPixels(hrText, Graphics.FONT_XTINY);
-        // Center the text under the icon which is drawn at x=screenWidth-20
-        dc.drawText((screenWidth - 20) + (20 - hrTextWidth) / 2, screenHeight / 2 + 5, Graphics.FONT_XTINY, hrText, Graphics.TEXT_JUSTIFY_LEFT);
+        // Center the text under the heart rate icon at 3 o'clock position, with increased spacing
+        // Approximate center of icon "p" when drawn at x=screenWidth-20
+        var hrCenterX = screenWidth - 30; // Approximate center of icon
+        dc.drawText(hrCenterX - hrTextWidth / 2, screenHeight / 2 + 15, Graphics.FONT_XTINY, hrText, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
