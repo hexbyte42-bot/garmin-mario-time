@@ -3,7 +3,7 @@
 ## 项目概述
 将 Pebble Time 的 Mario 表盘移植到 Garmin FR265 手表。
 
-## 当前状态（2026-02-06）
+## 当前状态（2026-02-09）
 
 ### ✅ 已完成
 
@@ -66,7 +66,7 @@
 - 完整集成 Garmin Connect IQ 设置系统
 - 支持角色选择和背景模式设置
 
-#### 4. 偣健度指标显示（优先级：高）
+#### 4. 健康度指标显示（优先级：高）
 - 顶部显示电池电量
 - 9点钟方向显示步数（图标在上，数据在下，居中对齐）
 - 3点钟方向显示心率（图标在上，数据在下，居中对齐）
@@ -74,6 +74,14 @@
 - 优化心率读取频率以节省电量
 - 调整字体大小和间距
 - 修复了马里奥跳跃动画完成后正确返回正常状态的bug
+
+### ⚠️ 已回退的功能
+
+#### 1. 设备端设置菜单（2026-02-09）
+**问题**：设备端角色选择和背景模式菜单功能不稳定，无法正常工作
+
+**决策**：回退到稳定版本，移除有问题的设备端菜单实现
+**当前状态**：保留通过 Connect IQ Mobile App 进行设置的功能，移除设备端直接设置
 
 ## 技术细节
 
@@ -106,7 +114,14 @@ garmin-mario-time-color/
     └── MarioTimeApp.mc    # 主代码
 ```
 
-## 编译命令
+## 编译方法和验证流程
+
+### 1. 开发环境设置
+- **SDK**: Garmin Connect IQ SDK 8.4.1 或更高版本
+- **开发者密钥**: 需要生成或使用现有的 `.developer_key` 文件
+- **目录结构**: 确保项目根目录包含 `monkey.jungle` 文件
+
+### 2. 编译命令（Windows）
 ```bash
 java -Xms1g -Dfile.encoding=UTF-8 -jar ^
   c:\Users\lib.in\AppData\Roaming\Garmin\ConnectIQ\Sdks\connectiq-sdk-win-8.4.1-2026-02-03-e9f77eeaa\bin\monkeybrains.jar ^
@@ -116,14 +131,65 @@ java -Xms1g -Dfile.encoding=UTF-8 -jar ^
   -d fr265_sim -w
 ```
 
+### 3. 编译命令（Linux/Mac）
+```bash
+java -Xms1g -Dfile.encoding=UTF-8 -jar \
+  /home/user/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa/bin/monkeybrains.jar \
+  -o bin/garminmariotimecolor.prg \
+  -f /path/to/garmin-mario-time/monkey.jungle \
+  -y /path/to/developer_key \
+  -d fr265_sim -w
+```
+
+### 4. 语法验证（无需密钥）
+```bash
+# 仅检查语法，不生成可执行文件
+monkeyc -f monkey.jungle -d fr265_sim --Eno-invalid-symbol
+```
+
+### 5. 编译验证流程
+1. **语法检查**: 确保代码无语法错误
+2. **资源验证**: 检查所有图片和字体文件存在且格式正确
+3. **模拟器测试**: 在 Connect IQ 模拟器中运行测试
+4. **真实设备测试**: 在实际 Garmin 设备上验证功能
+5. **性能测试**: 监控电池消耗和内存使用
+
+### 6. 提交前检查清单
+- [ ] 代码通过语法检查
+- [ ] 所有资源文件已包含
+- [ ] 功能在模拟器中正常工作
+- [ ] 动画逻辑完整（开始→执行→结束→重置）
+- [ ] 无内存泄漏（Timer 正确停止）
+- [ ] 错误处理完善（try-catch 块）
+- [ ] 开发日志已更新
+
+## 分支管理策略
+
+### 主分支（master）
+- 只包含经过充分测试的稳定功能
+- 每次提交必须通过编译验证
+- 保持可发布状态
+
+### 功能分支
+- 每个新功能在独立分支中开发
+- 充分测试后再考虑合并到 master
+- 如果功能不稳定，及时回退
+
+### 清理策略
+- 定期清理已完成或废弃的本地分支
+- 保留远程分支作为历史备份
+- 保持工作目录整洁
+
 ## 下一步工作
-1. 测试所有新功能（角色选择、背景模式、日期显示）
-2. 性能优化和电池续航测试
-3. 处理边界情况（如闰年、夏令时等）
-4. 准备发布版本
+1. **稳定版本维护**: 基于当前稳定版本进行小修小补
+2. **真实设备测试**: 在实际 FR265 手表上全面测试
+3. **性能优化**: 进一步优化电池续航
+4. **文档完善**: 更新用户手册和开发者指南
+5. **发布准备**: 准备 Connect IQ Store 提交流程
 
 ## 参考资料
 - Pebble 原版：https://github.com/ClusterM/pebble-mario
 - Garmin 字体文档：https://developer.garmin.com/connect-iq/connect-iq-faq/how-do-i-use-custom-fonts/
 - 使用自定义字体的表盘 https://github.com/wkusnierczyk/garmin-fancyfont-time
 - ttf2bmp 工具：https://github.com/wkusnierczyk/ttf2bmp
+- Connect IQ 开发者文档：https://developer.garmin.com/connect-iq/
