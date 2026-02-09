@@ -99,11 +99,8 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         
-        // Check for minute change - this is the correct way to detect minute changes
-        if (now.min != lastMinute) {
-            lastMinute = now.min;
-            startMarioJump();
-        }
+        // No longer trigger jump on minute change
+        // Jump is now triggered when screen wakes up (in onResume)
 
         // Draw background based on settings
         var hour = now.hour;
