@@ -310,6 +310,49 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
     
+    // Handle application lifecycle events to manage state during sleep/wake cycles
+    function onResume() {
+        // When the app resumes (screen wakes), check if we need to complete or restart animation
+        if (jumpState != 0) {
+            // We were in a jump state when paused
+            // Calculate how much time has passed since we were paused
+            var currentTime = System.getTimer();
+            var elapsedSincePause = currentTime - jumpPhaseStartTime;
+            
+            // Check if the animation should have completed while we were paused
+            var currentPhaseDuration = (jumpState == 1) ? jumpUpDuration : jumpDownDuration;
+            if (elapsedSincePause >= currentPhaseDuration) {
+                // Animation should have completed - land on ground
+                jumpState = 0;
+                if (jumpTimer != null) {
+                    jumpTimer.stop();
+                    jumpTimer = null;
+                }
+                animationStartTime = 0;
+                jumpPhaseStartTime = 0;
+            } else {
+                // Animation is still in progress - restart the timer
+                if (jumpTimer == null) {
+                    jumpTimer = new Timer.Timer();
+                }
+                jumpTimer.start(method(:onJumpUpdate), 66, true);
+            }
+        }
+        // Request update to refresh display with correct state
+        WatchUi.requestUpdate();
+    }
+    
+    function onPause() {
+        // When the app pauses (screen sleeps), just stop the timer but preserve state
+        // This allows us to resume the animation properly when screen wakes
+        if (jumpTimer != null) {
+            jumpTimer.stop();
+            jumpTimer = null;
+        }
+        // Keep the jump state intact - don't reset it
+        // This preserves the animation state for proper resumption
+    }
+    
     // Override to handle settings changes
     function onSettingsChanged() {
         loadSettings();
