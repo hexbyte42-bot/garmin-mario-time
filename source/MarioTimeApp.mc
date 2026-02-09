@@ -44,15 +44,10 @@ class MarioTimeView extends WatchUi.WatchFace {
     var backgroundUndergroundBitmap;
     var backgroundCastleBitmap;
 
+    var marioIsDown = true;
     var animationStartTime = 0;
+    var animationDuration = 400;
     var jumpTimer = null;
-    
-    // Jump state management (replaces marioIsDown)
-    var jumpState = 0;  // 0 = on ground (ready to jump), 1 = jumping up, 2 = falling down
-    var jumpPhaseStartTime = 0;  // Time when current jump phase started
-    var jumpUpDuration = 100;    // Duration for jump up phase (smoother animation)
-    var jumpDownDuration = 100;  // Duration for fall down phase (smoother animation)
-    var jumpDelay = 300;         // Delay before jump starts when screen wakes up (ms)
 
     var screenWidth = 0;
     var screenHeight = 0;
@@ -100,8 +95,11 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         
-        // No longer trigger jump on minute change
-        // Jump is now triggered when screen wakes up (in onResume)
+        // Check for minute change - this is the correct way to detect minute changes
+        if (now.min != lastMinute) {
+            lastMinute = now.min;
+            startMarioJump();
+        }
 
         // Draw background based on settings
         var hour = now.hour;
@@ -140,7 +138,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         var blockY = 80;
 
         // Animate blocks when character jumps
-        if (jumpState != 0) {
+        if (!marioIsDown) {
             var progress = getAnimationProgress();
             var bounceHeight = 15;
             blockY = blockY - (bounceHeight * Math.sin(progress * Math.PI)).toNumber();
@@ -178,24 +176,11 @@ class MarioTimeView extends WatchUi.WatchFace {
             // Position character on the ground (ground at Y=375, character height=120)
             var charY = 375 - 120;  // Character stands on ground at Y=375
 
-            if (jumpState != 0) {
-                // Calculate jump progress based on current jump phase
-                var elapsed = System.getTimer() - jumpPhaseStartTime;
-                var progress = 0.0;
-                
-                if (jumpState == 1) {  // Jumping up
-                    progress = elapsed.toFloat() / jumpUpDuration.toFloat();
-                    progress = (progress > 1.0) ? 1.0 : progress;  // Clamp to 1.0
-                    var jumpHeight = 60;
-                    var offset = (jumpHeight * Math.sin(progress * Math.PI / 2)).toNumber(); // Sin wave for first half (upward)
-                    charY = charY - offset;
-                } else if (jumpState == 2) {  // Falling down
-                    progress = elapsed.toFloat() / jumpDownDuration.toFloat();
-                    progress = (progress > 1.0) ? 1.0 : progress;  // Clamp to 1.0
-                    var jumpHeight = 60;
-                    var offset = (jumpHeight * Math.cos(progress * Math.PI / 2)).toNumber(); // Cos wave for second half (downward)
-                    charY = charY - (jumpHeight - offset); // Subtract remaining height from peak
-                }
+            if (!marioIsDown) {
+                var progress = getAnimationProgress();
+                var jumpHeight = 60;
+                var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
+                charY = charY - offset;  // Jump upward (negative offset)
             }
 
             dc.drawBitmap(charX, charY, characterBitmap);
@@ -206,7 +191,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function getCurrentCharacterBitmap() {
-        var isJumping = (jumpState != 0);
+        var isJumping = !marioIsDown;
         if (selectedCharacter == 1) { // Luigi
             return isJumping ? luigiJumpBitmap : luigiNormalBitmap;
         } else if (selectedCharacter == 2) { // Bowser
@@ -219,136 +204,49 @@ class MarioTimeView extends WatchUi.WatchFace {
     function getAnimationProgress() {
         if (animationStartTime == 0) { return 0.0; }
         var elapsed = System.getTimer() - animationStartTime;
-        var totalDuration = jumpUpDuration + jumpDownDuration;
-        if (elapsed >= totalDuration) { 
-            // Ensure we properly reset if animation is complete but state hasn't been updated yet
-            if (jumpState != 0) {
-                jumpState = 0;
-                if (jumpTimer != null) {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                }
-                animationStartTime = 0;
-                jumpPhaseStartTime = 0;
-            }
-            return 1.0; 
-        }
-        return elapsed.toFloat() / totalDuration.toFloat();
+        if (elapsed >= animationDuration) { return 1.0; }
+        return elapsed.toFloat() / animationDuration.toFloat();
     }
 
     function startMarioJump() {
-        if (jumpState != 0) { return; }  // Only jump if on ground
-        
-        jumpState = 1;  // Start jumping up
-        jumpPhaseStartTime = System.getTimer();
-        animationStartTime = System.getTimer();  // For overall animation tracking
-        
+        if (!marioIsDown) { return; }
+        marioIsDown = false;
+        animationStartTime = System.getTimer();
         if (jumpTimer == null) { 
             jumpTimer = new Timer.Timer(); 
         }
-        jumpTimer.start(method(:onJumpUpdate), 66, true); // ~15 FPS (power optimized)
+        jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
         WatchUi.requestUpdate();
     }
 
     function onJumpUpdate() {
-        var elapsed = System.getTimer() - jumpPhaseStartTime;
-        
-        if (jumpState == 1) {  // Jumping up phase
-            if (elapsed >= jumpUpDuration) {
-                // Transition to falling down phase
-                jumpState = 2;
-                jumpPhaseStartTime = System.getTimer();
-            }
-        } else if (jumpState == 2) {  // Falling down phase
-            if (elapsed >= jumpDownDuration) {
-                // Completed the full jump cycle - land on ground
-                jumpState = 0;  // Back on ground
-                
-                // Stop the timer to prevent further callbacks
-                if (jumpTimer != null) {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                }
-                
-                // Reset timers
-                animationStartTime = 0;
-                jumpPhaseStartTime = 0;
-            }
-        }
-        
-        // Request update to continue animation
-        WatchUi.requestUpdate();
-    }
-
-    // Override onPartialUpdate to handle animation updates properly
-    function onPartialUpdate(dc) {
-        // Only update if we're currently in a jump animation
-        if (jumpState != 0) {
-            var elapsed = System.getTimer() - jumpPhaseStartTime;
+        var elapsed = System.getTimer() - animationStartTime;
+        if (elapsed >= animationDuration) {
+            // Animation completed - ensure proper state
+            marioIsDown = true;
             
-            if (jumpState == 1 && elapsed >= jumpUpDuration) {  // Should transition to falling
-                jumpState = 2;
-                jumpPhaseStartTime = System.getTimer();
-            } else if (jumpState == 2 && elapsed >= jumpDownDuration) {  // Should land
-                jumpState = 0;  // Back on ground
-                
-                // Stop the timer to prevent further callbacks
-                if (jumpTimer != null) {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                }
-                
-                // Reset timers
-                animationStartTime = 0;
-                jumpPhaseStartTime = 0;
+            // Stop the timer first to prevent further callbacks
+            if (jumpTimer != null) {
+                jumpTimer.stop();
+                jumpTimer = null;
             }
             
-            // Request update to continue showing animation or transition to normal state
+            // Reset the animation start time
+            animationStartTime = 0;
+            
+            // Request immediate update to ensure the display shows the normal character state
+            WatchUi.requestUpdate();
+        } else {
+            // Continue animation updates
             WatchUi.requestUpdate();
         }
     }
-    
-    // Handle application lifecycle events to manage state during sleep/wake cycles
-    function onResume() {
-        // When the app resumes (screen wakes), check if we need to complete or restart animation
-        if (jumpState != 0) {
-            // We were in a jump state when paused
-            // Calculate how much time has passed since we were paused
-            var currentTime = System.getTimer();
-            var elapsedSincePause = currentTime - jumpPhaseStartTime;
-            
-            // Check if the animation should have completed while we were paused
-            var currentPhaseDuration = (jumpState == 1) ? jumpUpDuration : jumpDownDuration;
-            if (elapsedSincePause >= currentPhaseDuration) {
-                // Animation should have completed - land on ground
-                jumpState = 0;
-                if (jumpTimer != null) {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                }
-                animationStartTime = 0;
-                jumpPhaseStartTime = 0;
-            } else {
-                // Animation is still in progress - restart the timer
-                if (jumpTimer == null) {
-                    jumpTimer = new Timer.Timer();
-                }
-                jumpTimer.start(method(:onJumpUpdate), 66, true);
-            }
+
+    // Handle partial updates to ensure smooth animation and proper state transitions
+    function onPartialUpdate(dc) {
+        if (!marioIsDown) {
+            WatchUi.requestUpdate();
         }
-        // Request update to refresh display with correct state
-        WatchUi.requestUpdate();
-    }
-    
-    function onPause() {
-        // When the app pauses (screen sleeps), just stop the timer but preserve state
-        // This allows us to resume the animation properly when screen wakes
-        if (jumpTimer != null) {
-            jumpTimer.stop();
-            jumpTimer = null;
-        }
-        // Keep the jump state intact - don't reset it
-        // This preserves the animation state for proper resumption
     }
     
     // Override to handle settings changes
