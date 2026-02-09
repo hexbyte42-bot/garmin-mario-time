@@ -187,13 +187,13 @@ class MarioTimeView extends WatchUi.WatchFace {
                 
                 if (jumpState == 1) {  // Jumping up
                     progress = elapsed.toFloat() / jumpUpDuration.toFloat();
-                    progress = Math.min(progress, 1.0);  // Clamp to 1.0
+                    progress = (progress > 1.0) ? 1.0 : progress;  // Clamp to 1.0
                     var jumpHeight = 60;
                     var offset = (jumpHeight * Math.sin(progress * Math.PI / 2)).toNumber(); // Sin wave for first half (upward)
                     charY = charY - offset;
                 } else if (jumpState == 2) {  // Falling down
                     progress = elapsed.toFloat() / jumpDownDuration.toFloat();
-                    progress = Math.min(progress, 1.0);  // Clamp to 1.0
+                    progress = (progress > 1.0) ? 1.0 : progress;  // Clamp to 1.0
                     var jumpHeight = 60;
                     var offset = (jumpHeight * Math.cos(progress * Math.PI / 2)).toNumber(); // Cos wave for second half (downward)
                     charY = charY - (jumpHeight - offset); // Subtract remaining height from peak
