@@ -50,8 +50,9 @@ class MarioTimeView extends WatchUi.WatchFace {
     // Jump state management (replaces marioIsDown)
     var jumpState = 0;  // 0 = on ground (ready to jump), 1 = jumping up, 2 = falling down
     var jumpPhaseStartTime = 0;  // Time when current jump phase started
-    var jumpUpDuration = 75;     // Duration for jump up phase (optimized for power)
-    var jumpDownDuration = 75;   // Duration for fall down phase (optimized for power)
+    var jumpUpDuration = 100;    // Duration for jump up phase (smoother animation)
+    var jumpDownDuration = 100;  // Duration for fall down phase (smoother animation)
+    var jumpDelay = 300;         // Delay before jump starts when screen wakes up (ms)
 
     var screenWidth = 0;
     var screenHeight = 0;
