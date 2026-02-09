@@ -114,54 +114,9 @@ garmin-mario-time-color/
     └── MarioTimeApp.mc    # 主代码
 ```
 
-## 编译方法和验证流程
+## 编译和开发指南
 
-### 1. 开发环境设置
-- **SDK**: Garmin Connect IQ SDK 8.4.1 或更高版本
-- **开发者密钥**: 需要生成或使用现有的 `.developer_key` 文件
-- **目录结构**: 确保项目根目录包含 `monkey.jungle` 文件
-
-### 2. 编译命令（Windows）
-```bash
-java -Xms1g -Dfile.encoding=UTF-8 -jar ^
-  c:\Users\lib.in\AppData\Roaming\Garmin\ConnectIQ\Sdks\connectiq-sdk-win-8.4.1-2026-02-03-e9f77eeaa\bin\monkeybrains.jar ^
-  -o bin\garminmariotimecolor.prg ^
-  -f c:\home\garmin\watchface\garmin-mario-time-color\monkey.jungle ^
-  -y c:\home\garmin\developer_key ^
-  -d fr265_sim -w
-```
-
-### 3. 编译命令（Linux/Mac）
-```bash
-java -Xms1g -Dfile.encoding=UTF-8 -jar \
-  /home/user/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa/bin/monkeybrains.jar \
-  -o bin/garminmariotimecolor.prg \
-  -f /path/to/garmin-mario-time/monkey.jungle \
-  -y /path/to/developer_key \
-  -d fr265_sim -w
-```
-
-### 4. 语法验证（无需密钥）
-```bash
-# 仅检查语法，不生成可执行文件
-monkeyc -f monkey.jungle -d fr265_sim --Eno-invalid-symbol
-```
-
-### 5. 编译验证流程
-1. **语法检查**: 确保代码无语法错误
-2. **资源验证**: 检查所有图片和字体文件存在且格式正确
-3. **模拟器测试**: 在 Connect IQ 模拟器中运行测试
-4. **真实设备测试**: 在实际 Garmin 设备上验证功能
-5. **性能测试**: 监控电池消耗和内存使用
-
-### 6. 提交前检查清单
-- [ ] 代码通过语法检查
-- [ ] 所有资源文件已包含
-- [ ] 功能在模拟器中正常工作
-- [ ] 动画逻辑完整（开始→执行→结束→重置）
-- [ ] 无内存泄漏（Timer 正确停止）
-- [ ] 错误处理完善（try-catch 块）
-- [ ] 开发日志已更新
+详细的编译方法、环境设置和开发流程请参考 `COMPREHENSIVE_DEVELOPMENT_GUIDE.md` 文件。
 
 ## 分支管理策略
 
