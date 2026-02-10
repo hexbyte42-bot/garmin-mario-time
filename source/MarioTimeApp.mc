@@ -15,7 +15,7 @@ class MarioTimeApp extends Application.AppBase {
 }
 
 class MarioTimeView extends WatchUi.WatchFace {
-    // 1. Static resources for zero-allocation access
+    // 1. Static Resources (Zero-allocation lookup)
     static const CHAR_RES = [
         [Rez.Drawables.mario_normal, Rez.Drawables.mario_jump],
         [Rez.Drawables.luigi_normal, Rez.Drawables.luigi_jump],
@@ -26,18 +26,16 @@ class MarioTimeView extends WatchUi.WatchFace {
         Rez.Drawables.background_underground, Rez.Drawables.background_castle
     ];
 
-    // Assets
+    // 2. Class Members
     var charNormal, charJump, blockBmp, bgBmp;
     var timeFont, iconsFont;
 
-    // State & Animation
     var marioIsDown = true;
     var inLowPower = false;
     var animationStartTime = 0;
-    const ANIMATION_DURATION = 400;
+    static const ANIMATION_DURATION = 400;
     var jumpTimer = null;
     
-    // UI Cache
     var screenWidth, screenHeight;
     var lastMinute = -1;
     var is24Hour = true;
@@ -46,7 +44,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     var isCharging = false;
     var heartRate = "--";
     
-    // Settings
     var selectedCharacter = 0, selectedBackground = 0;
 
     function initialize() { WatchFace.initialize(); }
@@ -104,7 +101,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         
-        // Per-minute updates
         if (now.min != lastMinute) {
             lastMinute = now.min;
             updateTimeStrings(now);
@@ -115,18 +111,11 @@ class MarioTimeView extends WatchUi.WatchFace {
         
         handleSafetyCheck();
 
-        // RENDERING OPTIMIZATION: Use clipping if jumping to reduce fill rate overhead
-        // (Note: Background must be redrawn, but clipping helps sub-routines)
-        dc.clearClip();
+        // Optimized Rendering
         if (bgBmp != null) { dc.drawBitmap(0, 0, bgBmp); }
         else { dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK); dc.clear(); }
         
-        var sinProgress = 0;
-        if (!marioIsDown) {
-            sinProgress = Math.sin(getAnimationProgress() * Math.PI);
-            // Limit drawing area to the animated region for character and blocks
-            // dc.setClip(0, 60, screenWidth, 320); // Optional: further optimization
-        }
+        var sinProgress = (marioIsDown) ? 0 : Math.sin(getAnimationProgress() * Math.PI);
         
         drawBlocks(dc, sinProgress);
         drawCharacter(dc, sinProgress);
@@ -159,12 +148,12 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     private function handleSafetyCheck() {
         if (!marioIsDown && animationStartTime > 0) {
-            if (System.getTimer() - animationStartTime > 1000) { stopAnimation(); }
+            if (System.getTimer() - animationStartTime > 900) { stopAnimation(); }
         }
     }
 
     private function drawBlocks(dc, sinProgress) {
-        var blockX = (screenWidth - 200) >> 1; // Fast division
+        var blockX = (screenWidth - 200) >> 1; // Faster division
         var blockY = 80 - (15 * sinProgress).toNumber();
         if (blockBmp != null) {
             dc.drawBitmap(blockX, blockY, blockBmp);
@@ -190,7 +179,7 @@ class MarioTimeView extends WatchUi.WatchFace {
             marioIsDown = false;
             animationStartTime = System.getTimer();
             if (jumpTimer == null) { jumpTimer = new Timer.Timer(); }
-            else { jumpTimer.stop(); }
+            else { try { jumpTimer.stop(); } catch(e) {} }
             jumpTimer.start(method(:onJumpUpdate), 33, true);
             WatchUi.requestUpdate();
         } catch (e) { stopAnimation(); }
