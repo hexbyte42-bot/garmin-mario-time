@@ -73,7 +73,14 @@ class MarioTimeView extends WatchUi.WatchFace {
             }
             selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
             selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
-            is24Hour = System.getDeviceSettings().is24Hour;
+            
+            // More conservative approach to handle System.getDeviceSettings()
+            var settings = System.getDeviceSettings();
+            if (settings != null && settings has :is24Hour) {
+                is24Hour = settings.is24Hour;
+            } else {
+                is24Hour = true; // Default to 24-hour format if settings unavailable
+            }
         } catch (e) {
             // Fallback to default values if any error occurs
             selectedCharacter = 0;
