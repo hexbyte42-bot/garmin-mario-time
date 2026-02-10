@@ -48,6 +48,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     var animationStartTime = 0;
     var animationDuration = 400;
     var jumpTimer = null;
+    var inLowPower = false;
 
     var screenWidth = 0;
     var screenHeight = 0;
@@ -96,9 +97,12 @@ class MarioTimeView extends WatchUi.WatchFace {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         
         // Check for minute change - this is the correct way to detect minute changes
-        if (now.min != lastMinute) {
+        if (now.min != lastMinute && !inLowPower) {
             lastMinute = now.min;
             startMarioJump();
+        } else if (now.min != lastMinute && inLowPower) {
+            // If in low power mode, we don't update lastMinute yet
+            // This allows the jump to trigger when the watch wakes up
         }
 
         // Draw background based on settings
@@ -190,6 +194,22 @@ class MarioTimeView extends WatchUi.WatchFace {
         drawFitnessMetrics(dc, now);
     }
 
+    function onEnterSleep() {
+        inLowPower = true;
+        // Animation should not run in low power mode, reset to normal state
+        marioIsDown = true;
+        if (jumpTimer != null) {
+            jumpTimer.stop();
+            jumpTimer = null;
+        }
+        WatchUi.requestUpdate();
+    }
+
+    function onExitSleep() {
+        inLowPower = false;
+        WatchUi.requestUpdate();
+    }
+
     function getCurrentCharacterBitmap() {
         var isJumping = !marioIsDown;
         if (selectedCharacter == 1) { // Luigi
@@ -209,13 +229,21 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function startMarioJump() {
-        if (!marioIsDown) { return; }
+        if (!marioIsDown || inLowPower) { return; }
         marioIsDown = false;
         animationStartTime = System.getTimer();
+        
         if (jumpTimer == null) { 
             jumpTimer = new Timer.Timer(); 
         }
-        jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
+        
+        try {
+            jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
+        } catch (e) {
+            // If timer fails to start, reset state
+            marioIsDown = true;
+            jumpTimer = null;
+        }
         WatchUi.requestUpdate();
     }
 
