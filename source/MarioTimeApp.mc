@@ -341,17 +341,29 @@ class MarioTimeView extends WatchUi.WatchFace {
             // Icons font not available, skip drawing icon
         }
         
+        // Draw steps icon at fixed position
+        var iconX = 35; // Fixed icon position (moved right to accommodate 5-digit numbers)
+        
         if (stepsFont != null) {
-            dc.drawText(20, screenHeight / 2 - 25, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT); // "s" for steps icon on top
+            dc.drawText(iconX, screenHeight / 2 - 25, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT);
         }
         
-        // Draw steps count below the icon, centered under the icon
+        // Draw steps count below the icon, centered when possible
         var stepsText = hasSteps ? steps.format("%d") : "--";
         var stepsTextWidth = dc.getTextWidthInPixels(stepsText, Graphics.FONT_XTINY);
-        // Center the text under the icon at 9 o'clock position, with increased spacing
-        // Approximate center of icon "s" when drawn at x=20
-        var stepsCenterX = 30; // Approximate center of icon
-        dc.drawText(stepsCenterX - stepsTextWidth / 2, screenHeight / 2 + 15, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
+        
+        // Calculate ideal text position (centered under icon, assuming icon center is at iconX + 7)
+        var iconCenterX = iconX + 7; // Approximate center of icon
+        var idealTextX = iconCenterX - stepsTextWidth / 2;
+        
+        // Ensure text doesn't overflow left edge (min 5px)
+        var minLeftEdge = 5;
+        var textX = idealTextX;
+        if (idealTextX < minLeftEdge) {
+            textX = minLeftEdge; // Shift right to prevent overflow, breaking center alignment
+        }
+        
+        dc.drawText(textX, screenHeight / 2 + 15, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
         // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
         var hrFont = null;
