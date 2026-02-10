@@ -32,38 +32,208 @@ class MarioTimeApp extends Application.AppBase {
 }
 
 class MarioTimeView extends WatchUi.WatchFace {
-    var marioNormalBitmap;
-    var marioJumpBitmap;
-    var luigiNormalBitmap;
-    var luigiJumpBitmap;
-    var bowserNormalBitmap;
-    var bowserJumpBitmap;
-    var blockBitmap;
-    var backgroundDayBitmap;
-    var backgroundNightBitmap;
-    var backgroundUndergroundBitmap;
-    var backgroundCastleBitmap;
+    // Assets
+    var bitmaps = {};
+    var timeFont, iconsFont;
 
+    // State
     var marioIsDown = true;
     var animationStartTime = 0;
     var animationDuration = 400;
     var jumpTimer = null;
-
-    var screenWidth = 0;
-    var screenHeight = 0;
-    var lastMinute = -1;
+    var inLowPower = false;
     
-    // Settings variables
-    var selectedCharacter = 0;  // 0=Mario, 1=Luigi, 2=Bowser
-    var selectedBackground = 0; // 0=Auto, 1=Day, 2=Night, 3=Underground, 4=Castle
+    // Cached values
+    var screenWidth, screenHeight;
+    var lastMinute = -1;
+    var is24Hour = true;
+    
+    // User Settings
+    var selectedCharacter = 0; 
+    var selectedBackground = 0;
 
     function initialize() {
         WatchFace.initialize();
     }
 
-    // Ensure proper cleanup when view is destroyed
+    function onLayout(dc) {
+        screenWidth = dc.getWidth();
+        screenHeight = dc.getHeight();
+
+        // Batch load essential resources
+        var resMap = {
+            :mario_normal => Rez.Drawables.mario_normal, :mario_jump => Rez.Drawables.mario_jump,
+            :luigi_normal => Rez.Drawables.luigi_normal, :luigi_jump => Rez.Drawables.luigi_jump,
+            :bowser_normal => Rez.Drawables.bowser_normal, :bowser_jump => Rez.Drawables.bowser_jump,
+            :block => Rez.Drawables.block,
+            :bg_day => Rez.Drawables.background_day, :bg_night => Rez.Drawables.background_night,
+            :bg_under => Rez.Drawables.background_underground, :bg_castle => Rez.Drawables.background_castle
+        };
+        
+        var keys = resMap.keys();
+        for (var i = 0; i < keys.size(); i++) {
+            try { bitmaps[keys[i]] = WatchUi.loadResource(resMap[keys[i]]); } catch (e) { bitmaps[keys[i]] = null; }
+        }
+        
+        try { timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font); } catch (e) { timeFont = Graphics.FONT_MEDIUM; }
+        try { iconsFont = WatchUi.loadResource(Rez.Fonts.IconsFont); } catch (e) { iconsFont = null; }
+
+        loadSettings();
+    }
+
+    function loadSettings() {
+        // Use modern Properties API with fallback for older devices
+        if (Application has :Properties) {
+            selectedCharacter = Application.Properties.getValue("Character");
+            selectedBackground = Application.Properties.getValue("Background");
+        } else {
+            var app = Application.getApp();
+            selectedCharacter = app.getProperty("Character");
+            selectedBackground = app.getProperty("Background");
+        }
+        selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
+        selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
+        
+        is24Hour = System.getDeviceSettings().is24Hour;
+    }
+
     function onHide() {
-        // Stop jump animation timer if active
+        stopAnimation();
+        WatchFace.onHide();
+    }
+
+    function onUpdate(dc) {
+        var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        
+        // 1. Logic & Safety
+        handleSafetyCheck();
+        if (now.min != lastMinute && !inLowPower) {
+            lastMinute = now.min;
+            startMarioJump();
+        }
+
+        // 2. Rendering
+        drawBackground(dc, now.hour);
+        
+        var sinProgress = 0;
+        if (!marioIsDown) {
+            sinProgress = Math.sin(getAnimationProgress() * Math.PI);
+        }
+
+        drawBlocks(dc, now, sinProgress);
+        drawCharacter(dc, sinProgress);
+        drawFitnessMetrics(dc, now);
+    }
+
+    private function handleSafetyCheck() {
+        if (!marioIsDown && animationStartTime > 0) {
+            try {
+                var elapsed = System.getTimer() - animationStartTime;
+                // If animation has been running longer than expected (with 500ms safety margin)
+                if (elapsed > animationDuration + 500) {
+                    stopAnimation();
+                }
+            } catch (e) {
+                // Fallback: if any error occurs during safety check, force reset
+                stopAnimation();
+            }
+        }
+    }
+
+    private function drawBackground(dc, hour) {
+        var bgKey = :bg_day;
+        if (selectedBackground == 0) { // Auto mode
+            if (hour >= 22 || hour < 6) { 
+                bgKey = :bg_night; 
+            } else if (hour >= 6 && hour < 12) {
+                bgKey = :bg_day;
+            } else if (hour >= 12 && hour < 18) { 
+                bgKey = :bg_under; 
+            } else {
+                bgKey = :bg_castle;
+            }
+        } else {
+            var map = {1 => :bg_day, 2 => :bg_night, 3 => :bg_under, 4 => :bg_castle};
+            bgKey = map[selectedBackground];
+        }
+
+        if (bitmaps[bgKey] != null) {
+            dc.drawBitmap(0, 0, bitmaps[bgKey]);
+        } else {
+            dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
+            dc.fillRectangle(0, 0, screenWidth, screenHeight);
+        }
+    }
+
+    private function drawBlocks(dc, now, sinProgress) {
+        var blockSize = 100;
+        var blockX = (screenWidth - blockSize * 2) / 2;
+        var blockY = 80 - (15 * sinProgress).toNumber();
+
+        if (bitmaps[:block] != null) {
+            dc.drawBitmap(blockX, blockY, bitmaps[:block]);
+            dc.drawBitmap(blockX + blockSize, blockY, bitmaps[:block]);
+        }
+
+        var hourVal = now.hour;
+        if (!is24Hour) {
+            if (hourVal > 12) { hourVal = hourVal - 12; } else if (hourVal == 0) { hourVal = 12; }
+        }
+        var hourStr = hourVal.format("%d");
+        var minStr = now.min.format("%02d");
+
+        // Draw time in blocks using custom pixel font
+        // Original project uses brown color rgb(117, 58, 0)
+        dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(blockX + blockSize/2, blockY + 30, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + blockSize + blockSize/2, blockY + 30, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    private function drawCharacter(dc, sinProgress) {
+        var characterBitmap = getCurrentCharacterBitmap();
+        if (characterBitmap != null) {
+            var charX = (screenWidth - 120) / 2;
+            // Position character on the ground (ground at Y=375, character height=120)
+            var charY = 375 - 120;  // Character stands on ground at Y=375
+            charY = charY - (60 * sinProgress).toNumber();  // Jump upward (negative offset)
+
+            dc.drawBitmap(charX, charY, characterBitmap);
+        }
+    }
+
+    function getCurrentCharacterBitmap() {
+        var isJumping = !marioIsDown;
+        if (selectedCharacter == 1) { // Luigi
+            return isJumping ? bitmaps[:luigi_jump] : bitmaps[:luigi_normal];
+        } else if (selectedCharacter == 2) { // Bowser
+            return isJumping ? bitmaps[:bowser_jump] : bitmaps[:bowser_normal];
+        } else { // Mario (default)
+            return isJumping ? bitmaps[:mario_jump] : bitmaps[:mario_normal];
+        }
+    }
+
+    function startMarioJump() {
+        if (!marioIsDown || inLowPower) { return; }
+        try {
+            marioIsDown = false;
+            animationStartTime = System.getTimer();
+            if (jumpTimer == null) { 
+                jumpTimer = new Timer.Timer(); 
+            } else {
+                // Stop any existing timer to prevent conflicts
+                jumpTimer.stop();
+            }
+            jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
+            WatchUi.requestUpdate();
+        } catch (e) {
+            // Log error and ensure state is reset to prevent being stuck
+            stopAnimation();
+        }
+    }
+
+    function stopAnimation() {
+        marioIsDown = true;
+        animationStartTime = 0;
         if (jumpTimer != null) {
             try {
                 jumpTimer.stop();
@@ -72,174 +242,20 @@ class MarioTimeView extends WatchUi.WatchFace {
             }
             jumpTimer = null;
         }
-        marioIsDown = true;
-        animationStartTime = 0;
-        WatchFace.onHide();
+        WatchUi.requestUpdate();
     }
 
-    function onLayout(dc) {
-        screenWidth = dc.getWidth();
-        screenHeight = dc.getHeight();
-
-        try { marioNormalBitmap = WatchUi.loadResource(Rez.Drawables.mario_normal); } catch (e) { marioNormalBitmap = null; }
-        try { marioJumpBitmap = WatchUi.loadResource(Rez.Drawables.mario_jump); } catch (e) { marioJumpBitmap = null; }
-        try { luigiNormalBitmap = WatchUi.loadResource(Rez.Drawables.luigi_normal); } catch (e) { luigiNormalBitmap = null; }
-        try { luigiJumpBitmap = WatchUi.loadResource(Rez.Drawables.luigi_jump); } catch (e) { luigiJumpBitmap = null; }
-        try { bowserNormalBitmap = WatchUi.loadResource(Rez.Drawables.bowser_normal); } catch (e) { bowserNormalBitmap = null; }
-        try { bowserJumpBitmap = WatchUi.loadResource(Rez.Drawables.bowser_jump); } catch (e) { bowserJumpBitmap = null; }
-        try { blockBitmap = WatchUi.loadResource(Rez.Drawables.block); } catch (e) { blockBitmap = null; }
-        try { backgroundDayBitmap = WatchUi.loadResource(Rez.Drawables.background_day); } catch (e) { backgroundDayBitmap = null; }
-        try { backgroundNightBitmap = WatchUi.loadResource(Rez.Drawables.background_night); } catch (e) { backgroundNightBitmap = null; }
-        try { backgroundUndergroundBitmap = WatchUi.loadResource(Rez.Drawables.background_underground); } catch (e) { backgroundUndergroundBitmap = null; }
-        try { backgroundCastleBitmap = WatchUi.loadResource(Rez.Drawables.background_castle); } catch (e) { backgroundCastleBitmap = null; }
-
-        // Initialize settings with defaults
-        selectedCharacter = 0;
-        selectedBackground = 0;
-
-        return;
-    }
-
-    function loadSettings() {
-        // In ConnectIQ, settings values are loaded through the configuration system
-        // The actual values are accessible during runtime
-        // Using defaults initially, will be updated when settings are applied
-        selectedCharacter = 0; // Default to Mario
-        selectedBackground = 0; // Default to Auto
-    }
-
-    function onUpdate(dc) {
-        var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        
-        // Safety check: if Mario is stuck in jumping state for too long, reset it
-        if (!marioIsDown && animationStartTime > 0) {
-            try {
-                var elapsed = System.getTimer() - animationStartTime;
-                // If animation has been running longer than expected (with 500ms safety margin)
-                if (elapsed > animationDuration + 500) {
-                    // Force reset to prevent being stuck forever
-                    marioIsDown = true;
-                    animationStartTime = 0;
-                    if (jumpTimer != null) {
-                        try {
-                            jumpTimer.stop();
-                        } catch (e) {
-                            // Ignore timer stop errors, just ensure cleanup
-                        }
-                        jumpTimer = null;
-                    }
-                }
-            } catch (e) {
-                // Fallback: if any error occurs during safety check, force reset
-                marioIsDown = true;
-                animationStartTime = 0;
-                jumpTimer = null;
-            }
-        }
-        
-        // Check for minute change - this is the correct way to detect minute changes
-        if (now.min != lastMinute) {
-            lastMinute = now.min;
-            startMarioJump();
-        }
-
-        // Draw background based on settings
-        var hour = now.hour;
-        var bg = backgroundDayBitmap;
-
-        if (selectedBackground == 0) { // Auto mode
-            if (hour >= 22 || hour < 6) {
-                bg = backgroundNightBitmap;
-            } else if (hour >= 6 && hour < 12) {
-                bg = backgroundDayBitmap;
-            } else if (hour >= 12 && hour < 18) {
-                bg = backgroundUndergroundBitmap;
+    function onJumpUpdate() {
+        try {
+            var elapsed = System.getTimer() - animationStartTime;
+            if (elapsed >= animationDuration) {
+                stopAnimation();
             } else {
-                bg = backgroundCastleBitmap;
+                WatchUi.requestUpdate();
             }
-        } else if (selectedBackground == 1) { // Day
-            bg = backgroundDayBitmap;
-        } else if (selectedBackground == 2) { // Night
-            bg = backgroundNightBitmap;
-        } else if (selectedBackground == 3) { // Underground
-            bg = backgroundUndergroundBitmap;
-        } else if (selectedBackground == 4) { // Castle
-            bg = backgroundCastleBitmap;
-        }
-
-        if (bg != null) {
-            dc.drawBitmap(0, 0, bg);
-        } else {
-            dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
-            dc.fillRectangle(0, 0, screenWidth, screenHeight);
-        }
-
-        // Calculate block positions (blocks are 100x100)
-        var blockSize = 100;
-        var blockX = (screenWidth - blockSize * 2) / 2;
-        var blockY = 80;
-
-        // Animate blocks when character jumps
-        if (!marioIsDown) {
-            var progress = getAnimationProgress();
-            var bounceHeight = 15;
-            blockY = blockY - (bounceHeight * Math.sin(progress * Math.PI)).toNumber();
-        }
-
-        // Draw blocks
-        if (blockBitmap != null) {
-            dc.drawBitmap(blockX, blockY, blockBitmap);
-            dc.drawBitmap(blockX + blockSize, blockY, blockBitmap);
-        }
-
-        // Draw time in blocks (centered in each 100x100 block)
-        var hourVal = now.hour;
-        var minVal = now.min;
-        var is24Hour = System.getDeviceSettings().is24Hour;
-        if (!is24Hour) {
-            if (hourVal > 12) { hourVal = hourVal - 12; } else if (hourVal == 0) { hourVal = 12; }
-        }
-        var hourStr = hourVal.format("%d");
-        var minStr = minVal.format("%02d");
-
-        // Draw time in blocks using custom pixel font
-        var timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font);
-        var textY = blockY + 30;  // Center text in block
-        
-        // Original project uses brown color rgb(117, 58, 0)
-        dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(blockX + blockSize/2, textY, timeFont, hourStr, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(blockX + blockSize + blockSize/2, textY, timeFont, minStr, Graphics.TEXT_JUSTIFY_CENTER);
-
-        // Draw selected character (120x120)
-        var characterBitmap = getCurrentCharacterBitmap();
-        if (characterBitmap != null) {
-            var charX = (screenWidth - 120) / 2;
-            // Position character on the ground (ground at Y=375, character height=120)
-            var charY = 375 - 120;  // Character stands on ground at Y=375
-
-            if (!marioIsDown) {
-                var progress = getAnimationProgress();
-                var jumpHeight = 60;
-                var offset = (jumpHeight * Math.sin(progress * Math.PI)).toNumber();
-                charY = charY - offset;  // Jump upward (negative offset)
-            }
-
-            dc.drawBitmap(charX, charY, characterBitmap);
-        }
-        
-        // Draw fitness metrics (battery, steps, heart rate)
-        drawFitnessMetrics(dc, now);
-    }
-
-    function getCurrentCharacterBitmap() {
-        var isJumping = !marioIsDown;
-        if (selectedCharacter == 1) { // Luigi
-            return isJumping ? luigiJumpBitmap : luigiNormalBitmap;
-        } else if (selectedCharacter == 2) { // Bowser
-            return isJumping ? bowserJumpBitmap : bowserNormalBitmap;
-        } else { // Mario (default)
-            return isJumping ? marioJumpBitmap : marioNormalBitmap;
+        } catch (e) {
+            // Safety fallback: if any error occurs during animation update, reset state
+            stopAnimation();
         }
     }
 
@@ -248,79 +264,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         var elapsed = System.getTimer() - animationStartTime;
         if (elapsed >= animationDuration) { return 1.0; }
         return elapsed.toFloat() / animationDuration.toFloat();
-    }
-
-    function startMarioJump() {
-        if (!marioIsDown) { return; }
-        
-        try {
-            marioIsDown = false;
-            animationStartTime = System.getTimer();
-            
-            // Ensure timer is properly initialized
-            if (jumpTimer == null) { 
-                jumpTimer = new Timer.Timer(); 
-            } else {
-                // Stop any existing timer to prevent conflicts
-                jumpTimer.stop();
-            }
-            
-            jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
-            WatchUi.requestUpdate();
-        } catch (e) {
-            // Log error and ensure state is reset to prevent being stuck
-            marioIsDown = true;
-            animationStartTime = 0;
-            if (jumpTimer != null) {
-                try {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                } catch (stopError) {
-                    // Ignore stop errors, just nullify the reference
-                    jumpTimer = null;
-                }
-            }
-            // Request update to show normal state
-            WatchUi.requestUpdate();
-        }
-    }
-
-    function onJumpUpdate() {
-        try {
-            var elapsed = System.getTimer() - animationStartTime;
-            if (elapsed >= animationDuration) {
-                // Animation completed - ensure proper state
-                marioIsDown = true;
-                
-                // Stop the timer first to prevent further callbacks
-                if (jumpTimer != null) {
-                    jumpTimer.stop();
-                    jumpTimer = null;
-                }
-                
-                // Reset the animation start time
-                animationStartTime = 0;
-                
-                // Request immediate update to ensure the display shows the normal character state
-                WatchUi.requestUpdate();
-            } else {
-                // Continue animation updates
-                WatchUi.requestUpdate();
-            }
-        } catch (e) {
-            // Safety fallback: if any error occurs during animation update, reset state
-            marioIsDown = true;
-            animationStartTime = 0;
-            if (jumpTimer != null) {
-                try {
-                    jumpTimer.stop();
-                } catch (stopError) {
-                    // Ignore stop errors, just nullify the timer
-                }
-                jumpTimer = null;
-            }
-            WatchUi.requestUpdate();
-        }
     }
 
     // Handle partial updates to ensure smooth animation and proper state transitions
@@ -336,8 +279,23 @@ class MarioTimeView extends WatchUi.WatchFace {
         WatchUi.requestUpdate();
     }
     
+    function onEnterSleep() { 
+        inLowPower = true; 
+        stopAnimation(); 
+    }
+    
+    function onExitSleep() { 
+        inLowPower = false; 
+        WatchUi.requestUpdate(); 
+    }
+    
     function drawFitnessMetrics(dc, now) {
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        if (iconsFont == null) { 
+            // Fallback to default font if icons font not available
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        } else {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        }
         
         // Top: Battery icon only (no text, just icon indicating battery level)
         var batteryLevel = 0;
@@ -403,30 +361,15 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         // Draw battery icon at the top center
-        var batteryFont = null;
-        try {
-            batteryFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
-        } catch(e) {
-            // Icons font not available, skip drawing icon
-        }
-        
-        if (batteryFont != null) {
-            dc.drawText(screenWidth / 2, 15, batteryFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        if (iconsFont != null) {
+            dc.drawText(screenWidth / 2, 15, iconsFont, batteryIcon, Graphics.TEXT_JUSTIFY_CENTER);
         }
         
         // Draw steps icon at 9 o'clock position (left side, middle height) - icon on top, data below
-        var stepsFont = null;
-        try {
-            stepsFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
-        } catch(e) {
-            // Icons font not available, skip drawing icon
-        }
-        
-        // Draw steps icon at fixed position
         var iconX = 35; // Fixed icon position (moved right to accommodate 5-digit numbers)
         
-        if (stepsFont != null) {
-            dc.drawText(iconX, screenHeight / 2 - 25, stepsFont, "s", Graphics.TEXT_JUSTIFY_LEFT);
+        if (iconsFont != null) {
+            dc.drawText(iconX, screenHeight / 2 - 25, iconsFont, "s", Graphics.TEXT_JUSTIFY_LEFT);
         }
         
         // Draw steps count below the icon, centered when possible
@@ -447,15 +390,8 @@ class MarioTimeView extends WatchUi.WatchFace {
         dc.drawText(textX, screenHeight / 2 + 15, Graphics.FONT_XTINY, stepsText, Graphics.TEXT_JUSTIFY_LEFT);
         
         // Draw heart rate icon at 3 o'clock position (right side, middle height) - icon on top, data below
-        var hrFont = null;
-        try {
-            hrFont = WatchUi.loadResource(Rez.Fonts.IconsFont);
-        } catch(e) {
-            // Icons font not available, skip drawing icon
-        }
-        
-        if (hrFont != null) {
-            dc.drawText(screenWidth - 20, screenHeight / 2 - 25, hrFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
+        if (iconsFont != null) {
+            dc.drawText(screenWidth - 20, screenHeight / 2 - 25, iconsFont, "p", Graphics.TEXT_JUSTIFY_RIGHT); // "p" for heart rate/pulse icon on top
         }
         
         // Draw heart rate value below the icon, centered under the icon
