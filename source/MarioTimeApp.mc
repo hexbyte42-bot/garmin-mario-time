@@ -8,6 +8,7 @@ using Toybox.Timer;
 using Toybox.Lang;
 using Toybox.Activity;
 using Toybox.ActivityMonitor;
+using Toybox.Math;
 
 class MarioTimeApp extends Application.AppBase {
     function initialize() { AppBase.initialize(); }
@@ -41,7 +42,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     var screenWidth, screenHeight;
     var lastMinute = -1;
     var is24Hour = true;
-    var timeStr = ["", ""]; 
+    var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>; 
     var batLevel = 0;
     var isCharging = false;
     var heartRate = "--";
@@ -63,30 +64,15 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     function loadSettings() {
         try {
-            var app = Application.getApp();
-            if (Application has :Properties) {
-                selectedCharacter = Application.Properties.getValue("Character");
-                selectedBackground = Application.Properties.getValue("Background");
-            } else {
-                selectedCharacter = app.getProperty("Character");
-                selectedBackground = app.getProperty("Background");
-            }
-            selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
-            selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
-            
-            // More conservative approach to handle System.getDeviceSettings()
-            var settings = System.getDeviceSettings();
-            if (settings != null && settings has :is24Hour) {
-                is24Hour = settings.is24Hour;
-            } else {
-                is24Hour = true; // Default to 24-hour format if settings unavailable
-            }
+            selectedCharacter = Application.Properties.getValue("character");
+            selectedBackground = Application.Properties.getValue("background");
         } catch (e) {
-            // Fallback to default values if any error occurs
             selectedCharacter = 0;
             selectedBackground = 0;
-            is24Hour = true; // Default to 24-hour format
         }
+        selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
+        selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
+        is24Hour = System.getDeviceSettings().is24Hour;
     }
 
     function refreshResources() {
