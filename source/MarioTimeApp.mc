@@ -48,7 +48,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     var animationStartTime = 0;
     var animationDuration = 400;
     var jumpTimer = null;
-    var inLowPower = false;
 
     var screenWidth = 0;
     var screenHeight = 0;
@@ -139,12 +138,9 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
         
         // Check for minute change - this is the correct way to detect minute changes
-        if (now.min != lastMinute && !inLowPower) {
+        if (now.min != lastMinute) {
             lastMinute = now.min;
             startMarioJump();
-        } else if (now.min != lastMinute && inLowPower) {
-            // If in low power mode, we don't update lastMinute yet
-            // This allows the jump to trigger when the watch wakes up
         }
 
         // Draw background based on settings
@@ -236,22 +232,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         drawFitnessMetrics(dc, now);
     }
 
-    function onEnterSleep() {
-        inLowPower = true;
-        // Animation should not run in low power mode, reset to normal state
-        marioIsDown = true;
-        if (jumpTimer != null) {
-            jumpTimer.stop();
-            jumpTimer = null;
-        }
-        WatchUi.requestUpdate();
-    }
-
-    function onExitSleep() {
-        inLowPower = false;
-        WatchUi.requestUpdate();
-    }
-
     function getCurrentCharacterBitmap() {
         var isJumping = !marioIsDown;
         if (selectedCharacter == 1) { // Luigi
@@ -271,7 +251,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function startMarioJump() {
-        if (!marioIsDown || inLowPower) { return; }
+        if (!marioIsDown) { return; }
         
         try {
             marioIsDown = false;
@@ -282,11 +262,7 @@ class MarioTimeView extends WatchUi.WatchFace {
                 jumpTimer = new Timer.Timer(); 
             } else {
                 // Stop any existing timer to prevent conflicts
-                try {
-                    jumpTimer.stop();
-                } catch (e) {
-                    // Ignore stop error
-                }
+                jumpTimer.stop();
             }
             
             jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
@@ -298,10 +274,11 @@ class MarioTimeView extends WatchUi.WatchFace {
             if (jumpTimer != null) {
                 try {
                     jumpTimer.stop();
+                    jumpTimer = null;
                 } catch (stopError) {
                     // Ignore stop errors, just nullify the reference
+                    jumpTimer = null;
                 }
-                jumpTimer = null;
             }
             // Request update to show normal state
             WatchUi.requestUpdate();
@@ -317,11 +294,7 @@ class MarioTimeView extends WatchUi.WatchFace {
                 
                 // Stop the timer first to prevent further callbacks
                 if (jumpTimer != null) {
-                    try {
-                        jumpTimer.stop();
-                    } catch (e) {
-                        // Ignore
-                    }
+                    jumpTimer.stop();
                     jumpTimer = null;
                 }
                 
@@ -335,14 +308,14 @@ class MarioTimeView extends WatchUi.WatchFace {
                 WatchUi.requestUpdate();
             }
         } catch (e) {
-            // Error handling in callback
+            // Safety fallback: if any error occurs during animation update, reset state
             marioIsDown = true;
             animationStartTime = 0;
             if (jumpTimer != null) {
                 try {
                     jumpTimer.stop();
                 } catch (stopError) {
-                    // Ignore
+                    // Ignore stop errors, just nullify the timer
                 }
                 jumpTimer = null;
             }
