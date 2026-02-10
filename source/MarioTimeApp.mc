@@ -15,27 +15,39 @@ class MarioTimeApp extends Application.AppBase {
 }
 
 class MarioTimeView extends WatchUi.WatchFace {
-    // Assets (Optimized: only load what's needed)
-    var charNormal, charJump, blockBmp;
-    var bgBmp;
+    // Resource Constants to avoid runtime allocations
+    static const CHAR_RES = [
+        [Rez.Drawables.mario_normal, Rez.Drawables.mario_jump],
+        [Rez.Drawables.luigi_normal, Rez.Drawables.luigi_jump],
+        [Rez.Drawables.bowser_normal, Rez.Drawables.bowser_jump]
+    ];
+    static const BG_RES = [
+        Rez.Drawables.background_day, Rez.Drawables.background_night, 
+        Rez.Drawables.background_underground, Rez.Drawables.background_castle
+    ];
+
+    // Assets
+    var charNormal, charJump, blockBmp, bgBmp;
     var timeFont, iconsFont;
 
-    // State
+    // State & Animation
     var marioIsDown = true;
+    var inLowPower = false;
     var animationStartTime = 0;
     var animationDuration = 400;
     var jumpTimer = null;
-    var inLowPower = false;
     
-    // Cached values
+    // Cached values (UI Performance)
     var screenWidth, screenHeight;
     var lastMinute = -1;
     var is24Hour = true;
-    var timeStr = ["", ""]; // Cache for [hour, min] strings
+    var timeStr = ["", ""]; 
+    var batLevel = 0;
+    var isCharging = false;
+    var heartRate = "--";
     
     // User Settings
-    var selectedCharacter = 0; 
-    var selectedBackground = 0;
+    var selectedCharacter = 0, selectedBackground = 0;
 
     function initialize() { WatchFace.initialize(); }
 
@@ -46,6 +58,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         try { iconsFont = WatchUi.loadResource(Rez.Fonts.IconsFont); } catch (e) { iconsFont = null; }
         loadSettings();
         refreshResources();
+        updateSystemStats();
     }
 
     function loadSettings() {
@@ -62,39 +75,28 @@ class MarioTimeView extends WatchUi.WatchFace {
         is24Hour = System.getDeviceSettings().is24Hour;
     }
 
-    // MEMORY OPTIMIZATION: Only load relevant character and background
     function refreshResources() {
-        charNormal = null; charJump = null; bgBmp = null; blockBmp = null;
-        
-        var charRes = [
-            [Rez.Drawables.mario_normal, Rez.Drawables.mario_jump],
-            [Rez.Drawables.luigi_normal, Rez.Drawables.luigi_jump],
-            [Rez.Drawables.bowser_normal, Rez.Drawables.bowser_jump]
-        ];
         var c = (selectedCharacter >= 0 && selectedCharacter < 3) ? selectedCharacter : 0;
         try {
-            charNormal = WatchUi.loadResource(charRes[c][0]);
-            charJump = WatchUi.loadResource(charRes[c][1]);
+            charNormal = WatchUi.loadResource(CHAR_RES[c][0]);
+            charJump = WatchUi.loadResource(CHAR_RES[c][1]);
             blockBmp = WatchUi.loadResource(Rez.Drawables.block);
         } catch (e) {}
-
         updateBackgroundResource();
     }
 
     function updateBackgroundResource() {
-        var hour = Gregorian.info(Time.now(), Time.FORMAT_SHORT).hour;
-        var res = Rez.Drawables.background_day;
-        
-        if (selectedBackground == 0) { // Auto
-            if (hour >= 22 || hour < 6) { res = Rez.Drawables.background_night; }
-            else if (hour >= 12 && hour < 18) { res = Rez.Drawables.background_underground; }
-            else if (hour >= 18) { res = Rez.Drawables.background_castle; }
+        var resId;
+        if (selectedBackground == 0) {
+            var hour = Gregorian.info(Time.now(), Time.FORMAT_SHORT).hour;
+            if (hour >= 22 || hour < 6) { resId = BG_RES[1]; }
+            else if (hour >= 12 && hour < 18) { resId = BG_RES[2]; }
+            else if (hour >= 18) { resId = BG_RES[3]; }
+            else { resId = BG_RES[0]; }
         } else {
-            var bgs = [Rez.Drawables.background_day, Rez.Drawables.background_night, 
-                       Rez.Drawables.background_underground, Rez.Drawables.background_castle];
-            res = bgs[selectedBackground - 1];
+            resId = BG_RES[selectedBackground - 1];
         }
-        try { bgBmp = WatchUi.loadResource(res); } catch (e) { bgBmp = null; }
+        try { bgBmp = WatchUi.loadResource(resId); } catch (e) { bgBmp = null; }
     }
 
     function onHide() { stopAnimation(); }
@@ -102,17 +104,16 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         
-        // 1. Minute Change & Logic
         if (now.min != lastMinute) {
             lastMinute = now.min;
             updateTimeStrings(now);
+            updateSystemStats();
             if (selectedBackground == 0) { updateBackgroundResource(); }
             if (!inLowPower) { startMarioJump(); }
         }
         
         handleSafetyCheck();
 
-        // 2. Rendering (Optimized: single sin calculation)
         if (bgBmp != null) { dc.drawBitmap(0, 0, bgBmp); }
         else { dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK); dc.clear(); }
         
@@ -130,9 +131,26 @@ class MarioTimeView extends WatchUi.WatchFace {
         timeStr[1] = now.min.format("%02d");
     }
 
+    private function updateSystemStats() {
+        var stats = System.getSystemStats();
+        batLevel = stats.battery;
+        isCharging = stats.charging;
+        
+        var actInfo = Activity.getActivityInfo();
+        if (actInfo != null && actInfo.currentHeartRate != null) {
+            heartRate = actInfo.currentHeartRate.format("%d");
+        } else {
+            var hrIter = ActivityMonitor.getHeartRateHistory(1, true);
+            var sample = hrIter.next();
+            if (sample != null && sample.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                heartRate = sample.heartRate.format("%d");
+            } else { heartRate = "--"; }
+        }
+    }
+
     private function handleSafetyCheck() {
         if (!marioIsDown && animationStartTime > 0) {
-            if (System.getTimer() - animationStartTime > animationDuration + 500) { stopAnimation(); }
+            if (System.getTimer() - animationStartTime > 900) { stopAnimation(); }
         }
     }
 
@@ -191,40 +209,19 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     function onEnterSleep() { inLowPower = true; stopAnimation(); }
     function onExitSleep() { inLowPower = false; WatchUi.requestUpdate(); }
-    
-    function onSettingsChanged() { 
-        loadSettings(); 
-        refreshResources(); 
-        WatchUi.requestUpdate(); 
-    }
+    function onSettingsChanged() { loadSettings(); refreshResources(); WatchUi.requestUpdate(); }
 
     function drawFitnessMetrics(dc) {
         if (iconsFont == null) { return; }
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        
-        var stats = System.getSystemStats();
-        var batIcon = (stats.battery > 90) ? "h" : (stats.battery < 20 ? "k" : "m");
-        if (stats.charging) { batIcon = "l"; }
+        var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
+        if (isCharging) { batIcon = "l"; }
         dc.drawText(screenWidth / 2, 15, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
-
         var info = ActivityMonitor.getInfo();
         var steps = (info != null && info.steps != null) ? info.steps : 0;
         dc.drawText(35, screenHeight / 2 - 25, iconsFont, "s", Graphics.TEXT_JUSTIFY_LEFT);
         dc.drawText(42, screenHeight / 2 + 15, Graphics.FONT_XTINY, steps.format("%d"), Graphics.TEXT_JUSTIFY_CENTER);
-
-        var hr = "--";
-        // PERFORMANCE: Check Activity Info first, it's faster than history
-        var actInfo = Activity.getActivityInfo();
-        if (actInfo != null && actInfo.currentHeartRate != null) {
-            hr = actInfo.currentHeartRate.format("%d");
-        } else {
-            var hrIter = ActivityMonitor.getHeartRateHistory(1, true);
-            var sample = hrIter.next();
-            if (sample != null && sample.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
-                hr = sample.heartRate.format("%d");
-            }
-        }
         dc.drawText(screenWidth - 20, screenHeight / 2 - 25, iconsFont, "p", Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(screenWidth - 30, screenHeight / 2 + 15, Graphics.FONT_XTINY, hr, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(screenWidth - 30, screenHeight / 2 + 15, Graphics.FONT_XTINY, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
     }
 }
