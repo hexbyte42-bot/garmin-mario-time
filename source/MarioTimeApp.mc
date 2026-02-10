@@ -62,6 +62,22 @@ class MarioTimeView extends WatchUi.WatchFace {
         WatchFace.initialize();
     }
 
+    // Ensure proper cleanup when view is destroyed
+    function onHide() {
+        // Stop jump animation timer if active
+        if (jumpTimer != null) {
+            try {
+                jumpTimer.stop();
+            } catch (e) {
+                // Ignore errors during cleanup
+            }
+            jumpTimer = null;
+        }
+        marioIsDown = true;
+        animationStartTime = 0;
+        WatchFace.onHide();
+    }
+
     function onLayout(dc) {
         screenWidth = dc.getWidth();
         screenHeight = dc.getHeight();
@@ -95,6 +111,32 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        
+        // Safety check: if Mario is stuck in jumping state for too long, reset it
+        if (!marioIsDown && animationStartTime > 0) {
+            try {
+                var elapsed = System.getTimer() - animationStartTime;
+                // If animation has been running longer than expected (with 500ms safety margin)
+                if (elapsed > animationDuration + 500) {
+                    // Force reset to prevent being stuck forever
+                    marioIsDown = true;
+                    animationStartTime = 0;
+                    if (jumpTimer != null) {
+                        try {
+                            jumpTimer.stop();
+                        } catch (e) {
+                            // Ignore timer stop errors, just ensure cleanup
+                        }
+                        jumpTimer = null;
+                    }
+                }
+            } catch (e) {
+                // Fallback: if any error occurs during safety check, force reset
+                marioIsDown = true;
+                animationStartTime = 0;
+                jumpTimer = null;
+            }
+        }
         
         // Check for minute change - this is the correct way to detect minute changes
         if (now.min != lastMinute && !inLowPower) {
@@ -230,42 +272,80 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     function startMarioJump() {
         if (!marioIsDown || inLowPower) { return; }
-        marioIsDown = false;
-        animationStartTime = System.getTimer();
-        
-        if (jumpTimer == null) { 
-            jumpTimer = new Timer.Timer(); 
-        }
         
         try {
+            marioIsDown = false;
+            animationStartTime = System.getTimer();
+            
+            // Ensure timer is properly initialized
+            if (jumpTimer == null) { 
+                jumpTimer = new Timer.Timer(); 
+            } else {
+                // Stop any existing timer to prevent conflicts
+                try {
+                    jumpTimer.stop();
+                } catch (e) {
+                    // Ignore stop error
+                }
+            }
+            
             jumpTimer.start(method(:onJumpUpdate), 33, true); // ~30 FPS
+            WatchUi.requestUpdate();
         } catch (e) {
-            // If timer fails to start, reset state
+            // Log error and ensure state is reset to prevent being stuck
             marioIsDown = true;
-            jumpTimer = null;
+            animationStartTime = 0;
+            if (jumpTimer != null) {
+                try {
+                    jumpTimer.stop();
+                } catch (stopError) {
+                    // Ignore stop errors, just nullify the reference
+                }
+                jumpTimer = null;
+            }
+            // Request update to show normal state
+            WatchUi.requestUpdate();
         }
-        WatchUi.requestUpdate();
     }
 
     function onJumpUpdate() {
-        var elapsed = System.getTimer() - animationStartTime;
-        if (elapsed >= animationDuration) {
-            // Animation completed - ensure proper state
+        try {
+            var elapsed = System.getTimer() - animationStartTime;
+            if (elapsed >= animationDuration) {
+                // Animation completed - ensure proper state
+                marioIsDown = true;
+                
+                // Stop the timer first to prevent further callbacks
+                if (jumpTimer != null) {
+                    try {
+                        jumpTimer.stop();
+                    } catch (e) {
+                        // Ignore
+                    }
+                    jumpTimer = null;
+                }
+                
+                // Reset the animation start time
+                animationStartTime = 0;
+                
+                // Request immediate update to ensure the display shows the normal character state
+                WatchUi.requestUpdate();
+            } else {
+                // Continue animation updates
+                WatchUi.requestUpdate();
+            }
+        } catch (e) {
+            // Error handling in callback
             marioIsDown = true;
-            
-            // Stop the timer first to prevent further callbacks
+            animationStartTime = 0;
             if (jumpTimer != null) {
-                jumpTimer.stop();
+                try {
+                    jumpTimer.stop();
+                } catch (stopError) {
+                    // Ignore
+                }
                 jumpTimer = null;
             }
-            
-            // Reset the animation start time
-            animationStartTime = 0;
-            
-            // Request immediate update to ensure the display shows the normal character state
-            WatchUi.requestUpdate();
-        } else {
-            // Continue animation updates
             WatchUi.requestUpdate();
         }
     }
