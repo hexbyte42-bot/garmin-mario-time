@@ -62,17 +62,24 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function loadSettings() {
-        var app = Application.getApp();
-        if (Application has :Properties) {
-            selectedCharacter = Application.Properties.getValue("Character");
-            selectedBackground = Application.Properties.getValue("Background");
-        } else {
-            selectedCharacter = app.getProperty("Character");
-            selectedBackground = app.getProperty("Background");
+        try {
+            var app = Application.getApp();
+            if (Application has :Properties) {
+                selectedCharacter = Application.Properties.getValue("Character");
+                selectedBackground = Application.Properties.getValue("Background");
+            } else {
+                selectedCharacter = app.getProperty("Character");
+                selectedBackground = app.getProperty("Background");
+            }
+            selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
+            selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
+            is24Hour = System.getDeviceSettings().is24Hour;
+        } catch (e) {
+            // Fallback to default values if any error occurs
+            selectedCharacter = 0;
+            selectedBackground = 0;
+            is24Hour = true; // Default to 24-hour format
         }
-        selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
-        selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
-        is24Hour = System.getDeviceSettings().is24Hour;
     }
 
     function refreshResources() {
