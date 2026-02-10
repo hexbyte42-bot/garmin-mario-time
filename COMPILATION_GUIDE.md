@@ -64,8 +64,23 @@ export DEV_KEY=/path/to/your/developer_key
 
 - ✅ SDK 已正确安装
 - ✅ 项目配置正确 (monkey.jungle, manifest.xml)
-- ⚠️ 开发者密钥需要配置
-- ❌ 编译需要有效的开发者密钥
+- ✅ 开发者密钥已配置: `~/.Garmin/ConnectIQ/developer_key/developer_key.der`
+- ✅ 编译脚本可以正常工作
+
+## 快速开始
+
+```bash
+# 直接运行编译脚本
+./compile.sh
+
+# 或者手动编译
+~/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa/bin/monkeyc \
+    -f monkey.jungle \
+    -d fr265 \
+    -o bin/MarioTimeColor.prg \
+    -y ~/.Garmin/ConnectIQ/developer_key/developer_key.der \
+    -w
+```
 
 ## 已知问题
 

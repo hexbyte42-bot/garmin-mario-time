@@ -14,8 +14,8 @@ OUTPUT_DIR="$PROJECT_DIR/bin"
 OUTPUT_FILE="$OUTPUT_DIR/MarioTimeColor.prg"
 
 # 开发者密钥路径 - 需要配置正确的密钥
-# 密钥格式要求: PKCS#12 或 ConnectIQ 特定格式
-DEV_KEY="${DEV_KEY:-$HOME/.Garmin/ConnectIQ/mykey/developer_key.p12}"
+# 密钥格式要求: DER 格式
+DEV_KEY="${DEV_KEY:-$HOME/.Garmin/ConnectIQ/developer_key/developer_key.der}"
 
 # 确保输出目录存在
 mkdir -p "$OUTPUT_DIR"
