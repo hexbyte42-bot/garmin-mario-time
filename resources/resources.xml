@@ -19,6 +19,11 @@
     <!-- UI Elements (Color versions) -->
     <bitmap id="block" filename="block.png" />
 
+    <properties>
+        <property id="character" type="number">0</property>
+        <property id="background" type="number">0</property>
+    </properties>
+
     <!-- Strings -->
     <string id="AppName">Mario Time</string>
     <string id="CharacterTitle">Character</string>
