@@ -4,7 +4,7 @@ A port of the popular Pebble Mario watchface to Garmin Connect IQ devices, speci
 
 ## 🎮 Features
 
-- **Mario jumps every minute** (just like the original!)
+- **Mario jumps when screen wakes up** (if more than 1 minute has passed since last view)
 - **Question blocks bounce** when Mario jumps
 - **Custom pixel fonts** for time and date display
 - **Date display** (Day, Month, Date)
@@ -12,6 +12,8 @@ A port of the popular Pebble Mario watchface to Garmin Connect IQ devices, speci
 - **Character selection** (Mario, Luigi, Bowser)
 - **Auto background** that changes with time of day
 - **April Fools surprise** (Bowser appears on April 1st!)
+- **Low power mode optimization** - animations disabled during sleep mode
+- **Stuck animation fix** - prevents Mario from getting stuck in jump state
 
 ## 🎨 Color Resources
 
@@ -31,6 +33,8 @@ garmin-mario-time-color/
 ├── README.md
 ├── manifest.xml
 ├── build.xml
+├── font_generator.py          ← Font generation script (TTF → FNT/PNG)
+├── scale_images.py           ← Image scaling script (Pebble → Garmin)
 ├── resources/
 │   ├── mario_normal.png        ← Color version from Pebble Time
 │   ├── mario_jump.png          ← Color version from Pebble Time
@@ -43,12 +47,33 @@ garmin-mario-time-color/
 │   ├── background_underground.png ← Color basalt version (Pebble Time)
 │   ├── background_castle.png   ← Color basalt version (Pebble Time)
 │   ├── block.png              ← Color version from Pebble Time
-│   ├── watch_battery.png      ← Color version from Pebble Time
-│   ├── Gamegirl.ttf           ← Original font
-│   └── emulogic.ttf           ← Original font
+│   ├── launcher_icon.png      ← App icon
+│   ├── Gamegirl.ttf           ← Source TTF font for custom pixel font
+│   ├── emulogic.ttf           ← Alternative source TTF font
+│   ├── Gamegirl~color.ttf     ← Color variant TTF font
+│   ├── pixel_font.fnt         ← Generated Garmin font (time display)
+│   ├── pixel_font.png         ← Generated font atlas
+│   ├── icons-43px.fnt         ← Generated Garmin font (fitness icons)
+│   └── icons-43px_0.png       ← Generated icon atlas
 └── source/
     └── MarioTimeApp.mc        # Main source code
 ```
+
+## 🔧 Development Scripts
+
+### Font Generation (`font_generator.py`)
+Generates Garmin-compatible FNT + PNG font files from TTF sources:
+```bash
+python3 font_generator.py Gamegirl.ttf pixel_font 48
+```
+
+### Image Scaling (`scale_images.py`)
+Scales Pebble-sized assets (144x168) to Garmin FR265 size (416x416):
+```bash
+python3 scale_images.py
+```
+
+These scripts are essential for maintaining and updating the visual assets.
 
 ## 🔧 Setup Instructions
 
@@ -57,6 +82,16 @@ garmin-mario-time-color/
 3. **Set environment variable**: `export CONNECTIQ_SDK=/path/to/sdk`
 4. **Build the watchface**: `ant build`
 5. **Install to your watch**: `ant install`
+
+## 💡 Power Consumption Notes
+
+The current implementation is **power-optimized**:
+- Animations only trigger when user views the watchface (not every minute in background)
+- Sleep mode completely disables animations
+- Fixed stuck animation bug that could cause unnecessary battery drain
+- Low power mode detection prevents animations during battery saving
+
+This approach is **more efficient** than traditional minute-based triggers.
 
 ## 📥 Resources Source
 

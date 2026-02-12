@@ -19,6 +19,10 @@
     <!-- UI Elements (Color versions) -->
     <bitmap id="block" filename="block.png" />
 
+    <!-- Fonts -->
+    <font id="pixel_font" filename="pixel_font.fnt" />
+    <font id="IconsFont" filename="icons-43px.fnt" />
+
     <properties>
         <property id="character" type="number">0</property>
         <property id="background" type="number">0</property>
