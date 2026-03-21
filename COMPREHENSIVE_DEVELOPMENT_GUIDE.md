@@ -1,154 +1,155 @@
-# 🎮 Garmin Mario Time 表盘 - 综合开发指南
+# Garmin Mario Time: Comprehensive Development Guide
 
-## 项目概述
-将 Pebble Time 的 Mario 表盘移植到 Garmin FR265 手表，支持 416x416 像素屏幕。
+## Project Overview
 
-## 当前状态（2026-02-09）
+This repository ports the Pebble Time `pebble-mario` watchface to Garmin Connect IQ devices, currently targeting the Garmin Forerunner 265 with a 416x416 display.
 
-### ✅ 核心功能
-- **时间显示**: 支持 12/24 小时格式，使用自定义 Gamegirl 像素字体
-- **背景切换**: 自动/手动切换 day/night/underground/castle 四种背景
-- **角色支持**: Mario/Luigi/Bowser 三种角色，每分钟跳跃动画
-- **健康指标**: 电池电量、步数、心率显示
-- **稳定性**: 回退了有问题的设备端设置菜单，保持核心功能稳定
+The implementation is intentionally split between:
 
-### ⚠️ 已知限制
-- 无设备端设置菜单（通过 Connect IQ Mobile App 进行设置）
-- 需要开发者密钥进行完整编译
+- Pebble-faithful behavior where it matters visually and behaviorally
+- Garmin-specific utility where it adds practical value, such as watch battery, steps, and heart rate
 
-## 开发环境
+## Current Status
 
-### SDK 信息
-- **路径**: `/home/buzz-bot/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa`
-- **版本**: Connect IQ Compiler version 8.4.1
-- **构建日期**: 2026-02-03
-- **Git Commit**: e9f77eeaa
+### Core Features Implemented
 
-### 环境设置
+- 12/24 hour support
+- Minute-based Mario jump animation
+- Delayed block bounce and sliding time transition
+- Date row
+- Character selection: Mario, Luigi, Bowser
+- April 1 Bowser override
+- Automatic and manual background selection
+- Watch battery indicator
+- Garmin activity metrics: steps and heart rate
+
+### Known Constraints
+
+- No device-side menu implementation
+- Settings are currently driven through Connect IQ settings
+- Pebble companion features are not implemented:
+  - phone battery
+  - weather
+  - Bluetooth disconnect icon
+  - vibration alerts
+
+## Development Environment
+
+### SDK
+
+- Path: `/home/buzz-bot/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa`
+- Compiler version: 8.4.1
+- Build date: 2026-02-03
+- Commit: `e9f77eeaa`
+
+### Environment Setup
+
 ```bash
-# 安装 SDK 后设置环境变量
-export CIQ_SDK_PATH="/path/to/connectiq-sdk"
+export CIQ_SDK_PATH="$HOME/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa"
 export PATH="$PATH:$CIQ_SDK_PATH/bin"
-
-# 创建开发者密钥（首次需要）
-connectiq keys --create
 ```
 
-## 编译方法
+## Build Workflow
 
-### 语法检查（无需密钥）
+### Recommended
+
 ```bash
-# 快速验证代码语法
-monkeyc -f monkey.jungle -d fr265_sim -w --Eno-invalid-symbol
+./compile.sh
 ```
 
-### 完整编译
+### Manual Build
+
 ```bash
-# Linux/Mac
-java -Xms1g -Dfile.encoding=UTF-8 -jar \
-  $CIQ_SDK_PATH/bin/monkeybrains.jar \
-  -o bin/garminmariotime.prg \
+~/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa/bin/monkeyc \
   -f monkey.jungle \
-  -y developer_key \
-  -d fr265_sim -w
-
-# Windows (PowerShell)
-java -Xms1g -Dfile.encoding=UTF-8 -jar `
-  C:\Users\username\AppData\Roaming\Garmin\ConnectIQ\Sdks\connectiq-sdk-win-8.4.1-2026-02-03-e9f77eeaa\bin\monkeybrains.jar `
-  -o bin\garminmariotime.prg `
-  -f monkey.jungle `
-  -y developer_key `
-  -d fr265_sim -w
+  -d fr265 \
+  -o bin/MarioTimeColor.prg \
+  -y ~/.Garmin/ConnectIQ/developer_key/developer_key.der \
+  -w
 ```
 
-### 自动化脚本
-**build.sh**:
-```bash
-#!/bin/bash
-set -e
-SDK_PATH="$HOME/.Garmin/ConnectIQ/Sdks/connectiq-sdk-lin-8.4.1-2026-02-03-e9f77eeaa"
-KEY_FILE="developer_key"
+## Repository Structure
 
-if [ ! -f "$KEY_FILE" ]; then
-    echo "Error: developer_key not found. Run 'connectiq keys --create' first."
-    exit 1
-fi
-
-echo "Compiling Mario Time watch face..."
-java -Xms1g -Dfile.encoding=UTF-8 -jar \
-    "$SDK_PATH/bin/monkeybrains.jar" \
-    -o bin/garminmariotime.prg \
-    -f monkey.jungle \
-    -y "$KEY_FILE" \
-    -d fr265_sim -w
-
-echo "Compilation successful! Output: bin/garminmariotime.prg"
-```
-
-## 项目结构
-```
+```text
 garmin-mario-time/
-├── manifest.xml          # 应用元数据
-├── monkey.jungle         # 构建配置
-├── build.xml            # Ant 构建脚本
-├── resources/           # 资源文件
-│   ├── resources.xml    # 资源定义
-│   ├── fonts.xml        # 字体配置
-│   └── *.png           # 图片资源
+├── manifest.xml
+├── monkey.jungle
+├── build.xml
+├── resources/
+│   ├── resources.xml
+│   ├── fonts.xml
+│   └── *.png
 └── source/
-    └── MarioTimeApp.mc  # 主源代码
+    └── MarioTimeApp.mc
 ```
 
-## 开发规范
+## Code Guidelines
 
-### 分支策略
-- **master**: 稳定生产版本，只包含经过验证的功能
-- **功能分支**: 新功能在独立分支中开发和测试
-- **提交要求**: 所有代码必须先通过编译验证再提交
+- Prefer official Connect IQ APIs and stable watchface lifecycle hooks.
+- Do not rely on non-existent callbacks such as `onMinuteChanged()`.
+- Keep recurring work cached and update it on minute boundaries rather than during every animation frame.
+- Stop timers cleanly when leaving the view or entering sleep.
+- Clamp and normalize settings values before indexing any resource arrays.
+- Preserve user changes in a dirty worktree unless the task explicitly requires otherwise.
 
-### 代码规范
-- 使用 Connect IQ 官方 API 和最佳实践
-- 避免使用非标准回调函数（如 `onMinuteChanged()`）
-- 正确处理 Timer 资源，防止内存泄漏
-- 实现完整的错误处理和回退机制
+## Behavioral Parity Goals
 
-### 测试要求
-- 所有功能必须在模拟器中编译通过
-- 动画功能需要验证完整周期（开始→执行→结束→重置）
-- 性能优化需要监控电池消耗
+When changing the watchface, preserve or improve these upstream Pebble traits:
 
-## 提交前检查清单
-- [ ] 代码通过语法检查
-- [ ] 完整编译成功
-- [ ] 在模拟器中正常运行
-- [ ] 所有新功能经过测试
-- [ ] 无内存泄漏（Timer 正确停止）
-- [ ] 错误处理完整（try-catch 块）
-- [ ] 代码符合开发规范
+- Mario jumps every minute
+- Question blocks bounce after the jump starts
+- The time transitions during the bounce
+- The date stays visible in the upper area
+- Background changes follow the original Pebble schedule
+- April 1 forces Bowser
 
-## 常见问题解决
+Garmin-specific additions are acceptable if they do not overwhelm the original composition.
 
-### 编译错误
-- **"Private key not specified"**: 创建开发者密钥
-- **"Symbol not found"**: 检查资源 ID 是否一致
-- **"Type mismatch"**: 确保变量类型一致
-- **"Memory limit exceeded"**: 优化资源大小
+## Testing Expectations
 
-### 功能问题
-- **动画卡住**: 确保 Timer 正确停止和状态重置
-- **资源不显示**: 检查图片格式和路径
-- **设置不生效**: 验证 Application.Properties 使用正确
+- The project must compile cleanly.
+- Minute transition behavior must be checked through a full animation cycle.
+- Character switching must be validated through settings changes.
+- Background switching must be checked in both auto and manual modes.
+- Battery, steps, and heart rate should degrade gracefully when data is unavailable.
 
-## 下一步工作
-1. **真实设备测试**: 在实际 FR265 手表上全面测试
-2. **性能优化**: 进一步优化电池续航
-3. **文档完善**: 更新用户手册
-4. **发布准备**: 准备 Connect IQ Store 提交流程
+## Pre-Commit Checklist
 
-## 参考资料
-- [Pebble 原版](https://github.com/ClusterM/pebble-mario)
-- [Garmin 开发者文档](https://developer.garmin.com/connect-iq/)
-- [ttf2bmp 工具](https://github.com/wkusnierczyk/ttf2bmp)
+- Code compiles successfully
+- Settings changes still apply correctly
+- No timer leak or stuck animation state
+- Docs still match the implementation
+- No unrelated user changes were reverted
+
+## Troubleshooting
+
+### Build Errors
+
+- `Private key not specified`: configure a valid developer key
+- `Symbol not found`: verify resource IDs, imports, and API names
+- `Type mismatch`: check Connect IQ API return types carefully
+- `Memory limit exceeded`: reduce allocations and avoid repeated resource loads
+
+### Runtime Issues
+
+- Animation gets stuck: verify timer stop/reset logic
+- Character or background changes do not apply: verify settings normalization and `onSettingsChanged()`
+- Missing resources: verify bitmap IDs and filenames in `resources/resources.xml`
+- Missing heart rate: fall back cleanly when current or historical HR data is unavailable
+
+## Next Recommended Work
+
+1. Real-device validation on FR265 hardware
+2. Add a lightweight validation script for build plus doc consistency checks
+3. Revisit selected Pebble companion features if parity becomes a higher priority
+4. Keep README and backlog docs synchronized with actual behavior
+
+## References
+
+- Upstream Pebble project: <https://github.com/ClusterM/pebble-mario>
+- Garmin Connect IQ docs: <https://developer.garmin.com/connect-iq/>
+- `ttf2bmp`: <https://github.com/wkusnierczyk/ttf2bmp>
 
 ---
-*最后更新: 2026-02-09*
+
+Last updated: 2026-03-21

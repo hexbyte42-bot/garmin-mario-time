@@ -5,13 +5,29 @@ A port of the popular Pebble Mario watchface to Garmin Connect IQ devices, speci
 ## 🎮 Features
 
 - **Mario jumps every minute** (just like the original!)
-- **Question blocks bounce** when Mario jumps
-- **Custom pixel fonts** for time and date display
-- **Date display** (Day, Month, Date)
-- **Watch battery indicator only** (simplified as requested)
+- **Question blocks bounce and the time slides** during the minute change
+- **Date display** (day, month, date) near the original Pebble layout
+- **Watch battery indicator** in an original-inspired top-right position
+- **Garmin activity metrics** for steps and heart rate
 - **Character selection** (Mario, Luigi, Bowser)
-- **Auto background** that changes with time of day
+- **Auto background** that follows the Pebble schedule
 - **April Fools surprise** (Bowser appears on April 1st!)
+
+## Pebble Parity
+
+Implemented to stay close to the upstream Pebble watchface:
+
+- Minute jump animation with delayed block bounce and time transition
+- Date row
+- April 1 Bowser override
+- Auto/manual background selection using the original time-of-day split
+- Configurable character switching
+
+Remaining differences from upstream Pebble behavior:
+
+- No Pebble companion app features such as phone battery, weather, Bluetooth disconnect icon, or vibration alerts
+- The Garmin layout is scaled for the FR265 display rather than reproducing Pebble pixel coordinates exactly
+- Garmin adds watch battery, steps, and heart-rate data that were not part of the original Pebble face
 
 ## 🎨 Color Resources
 
@@ -19,7 +35,7 @@ This version uses **color resources specifically created for Pebble Time** (the 
 
 - **Rich color backgrounds** (Day, Night, Underground, Castle themes)
 - **Color character sprites** (Mario, Luigi, Bowser in full color)
-- **Color UI elements** (blocks, battery icons with proper colors)
+- **Color UI elements** (blocks and character art from the original color build)
 - **Optimized for color displays** like the Garmin Forerunner 265
 
 All graphics have been copied directly from the original Pebble Mario repository's color assets.
@@ -27,7 +43,7 @@ All graphics have been copied directly from the original Pebble Mario repository
 ## 📦 Project Structure
 
 ```
-garmin-mario-time-color/
+garmin-mario-time/
 ├── README.md
 ├── manifest.xml
 ├── build.xml
@@ -43,7 +59,6 @@ garmin-mario-time-color/
 │   ├── background_underground.png ← Color basalt version (Pebble Time)
 │   ├── background_castle.png   ← Color basalt version (Pebble Time)
 │   ├── block.png              ← Color version from Pebble Time
-│   ├── watch_battery.png      ← Color version from Pebble Time
 │   ├── Gamegirl.ttf           ← Original font
 │   └── emulogic.ttf           ← Original font
 └── source/
@@ -63,6 +78,6 @@ garmin-mario-time-color/
 All graphics and font files have been **copied directly from the original Pebble Mario watchface repository**:
 - https://github.com/ClusterM/pebble-mario
 
-Specifically using the **color assets** created for **Pebble Time** (basalt platform) to ensure the best visual experience on your color Garmin Forerunner 265!
+Specifically using the **color assets** created for **Pebble Time** (basalt platform) to keep the Garmin port visually close to the original color watchface on Forerunner 265 hardware.
 
 Enjoy your Mario Time watchface! 🍄

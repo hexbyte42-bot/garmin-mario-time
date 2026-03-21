@@ -16,6 +16,14 @@ class MarioTimeApp extends Application.AppBase {
 }
 
 class MarioTimeView extends WatchUi.WatchFace {
+    static const CHARACTER_COUNT = 3;
+    static const BACKGROUND_COUNT = 4;
+    static const JUMP_FRAME_INTERVAL_MS = 67;
+    static const APRIL_FOOLS_MONTH = 4;
+    static const APRIL_FOOLS_DAY = 1;
+    static const TIME_SLIDE_DISTANCE = 62;
+    static const BLOCK_ANIMATION_DELAY = 0.44;
+
     // Resource Constants to avoid runtime allocations
     static const CHAR_RES = [
         [Rez.Drawables.mario_normal, Rez.Drawables.mario_jump],
@@ -42,22 +50,31 @@ class MarioTimeView extends WatchUi.WatchFace {
     var screenWidth, screenHeight;
     var lastMinute = -1;
     var is24Hour = true;
-    var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>; 
+    var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
+    var previousTimeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
+    var dateStr = "";
     var batLevel = 0;
     var isCharging = false;
+    var steps = 0;
     var heartRate = "--";
-    
+
     // User Settings
     var selectedCharacter = 0, selectedBackground = 0;
+    var activeBackgroundIndex = -1;
+    var activeCharacterIndex = -1;
 
     function initialize() { WatchFace.initialize(); }
 
     function onLayout(dc) {
+        var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
         screenWidth = dc.getWidth();
         screenHeight = dc.getHeight();
         try { timeFont = WatchUi.loadResource(Rez.Fonts.pixel_font); } catch (e) { timeFont = Graphics.FONT_MEDIUM; }
         try { iconsFont = WatchUi.loadResource(Rez.Fonts.IconsFont); } catch (e) { iconsFont = null; }
         loadSettings();
+        updateTimeStrings(now, false);
+        updateDateString(now);
+        lastMinute = now.min;
         refreshResources();
         updateSystemStats();
     }
@@ -70,13 +87,14 @@ class MarioTimeView extends WatchUi.WatchFace {
             selectedCharacter = 0;
             selectedBackground = 0;
         }
-        selectedCharacter = (selectedCharacter != null) ? selectedCharacter : 0;
-        selectedBackground = (selectedBackground != null) ? selectedBackground : 0;
+        selectedCharacter = normalizeSettingValue(selectedCharacter, 0, CHARACTER_COUNT - 1, 0);
+        selectedBackground = normalizeSettingValue(selectedBackground, 0, BACKGROUND_COUNT, 0);
         is24Hour = System.getDeviceSettings().is24Hour;
     }
 
     function refreshResources() {
-        var c = (selectedCharacter >= 0 && selectedCharacter < 3) ? selectedCharacter : 0;
+        var c = getEffectiveCharacterIndex(Gregorian.info(Time.now(), Time.FORMAT_LONG));
+        activeCharacterIndex = c;
         try {
             charNormal = WatchUi.loadResource(CHAR_RES[c][0]);
             charJump = WatchUi.loadResource(CHAR_RES[c][1]);
@@ -86,65 +104,98 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function updateBackgroundResource() {
-        var resId;
+        var bgIndex;
         if (selectedBackground == 0) {
             var hour = Gregorian.info(Time.now(), Time.FORMAT_SHORT).hour;
-            if (hour >= 22 || hour < 6) { resId = BG_RES[1]; }
-            else if (hour >= 12 && hour < 18) { resId = BG_RES[2]; }
-            else if (hour >= 18) { resId = BG_RES[3]; }
-            else { resId = BG_RES[0]; }
+            if (hour < 4) { bgIndex = 2; }
+            else if (hour < 8) { bgIndex = 3; }
+            else if (hour < 20) { bgIndex = 0; }
+            else { bgIndex = 1; }
         } else {
-            resId = BG_RES[selectedBackground - 1];
+            bgIndex = selectedBackground - 1;
         }
-        try { bgBmp = WatchUi.loadResource(resId); } catch (e) { bgBmp = null; }
+        bgIndex = normalizeSettingValue(bgIndex, 0, BACKGROUND_COUNT - 1, 0);
+        if (bgIndex == activeBackgroundIndex && bgBmp != null) { return; }
+        activeBackgroundIndex = bgIndex;
+        try { bgBmp = WatchUi.loadResource(BG_RES[bgIndex]); } catch (e) { bgBmp = null; }
     }
 
     function onHide() { stopAnimation(); }
 
     function onUpdate(dc) {
-        var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        
+        var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
+
         if (now.min != lastMinute) {
-            lastMinute = now.min;
-            updateTimeStrings(now);
+            updateTimeStrings(now, true);
+            updateDateString(now);
             updateSystemStats();
             if (selectedBackground == 0) { updateBackgroundResource(); }
+            if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
             if (!inLowPower) { startMarioJump(); }
+            lastMinute = now.min;
         }
-        
+
         handleSafetyCheck();
 
         if (bgBmp != null) { dc.drawBitmap(0, 0, bgBmp); }
         else { dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK); dc.clear(); }
-        
-        var sinProgress = (marioIsDown) ? 0 : Math.sin(getAnimationProgress() * Math.PI);
-        
-        drawBlocks(dc, sinProgress);
-        drawCharacter(dc, sinProgress);
-        drawFitnessMetrics(dc);
+
+        drawDate(dc);
+
+        var animationProgress = getAnimationProgress();
+        var marioProgress = (marioIsDown) ? 0.0 : Math.sin(animationProgress * Math.PI);
+        var blockProgress = getBlockAnimationProgress(animationProgress);
+        var blockBounce = (marioIsDown) ? 0.0 : Math.sin(blockProgress * Math.PI);
+
+        drawBlocks(dc, blockBounce, blockProgress);
+        drawCharacter(dc, marioProgress);
+        drawBattery(dc);
+        drawActivityMetrics(dc);
     }
 
-    private function updateTimeStrings(now) {
+    private function updateTimeStrings(now, shouldAnimate) {
+        previousTimeStr[0] = timeStr[0];
+        previousTimeStr[1] = timeStr[1];
+
         var h = now.hour;
         if (!is24Hour) { h = (h > 12) ? h - 12 : (h == 0 ? 12 : h); }
-        timeStr[0] = h.format("%d");
+        timeStr[0] = h.format("%02d");
         timeStr[1] = now.min.format("%02d");
+
+        if (!shouldAnimate || previousTimeStr[0] == "") {
+            previousTimeStr[0] = timeStr[0];
+            previousTimeStr[1] = timeStr[1];
+        }
+    }
+
+    private function updateDateString(now) {
+        dateStr = Lang.format("$1$, $2$ $3$", [now.day_of_week, now.month, now.day.format("%02d")]);
     }
 
     private function updateSystemStats() {
         var stats = System.getSystemStats();
         batLevel = stats.battery;
         isCharging = stats.charging;
-        
+
+        var info = ActivityMonitor.getInfo();
+        steps = (info != null && info.steps != null) ? info.steps : 0;
+
         var actInfo = Activity.getActivityInfo();
         if (actInfo != null && actInfo.currentHeartRate != null) {
             heartRate = actInfo.currentHeartRate.format("%d");
-        } else {
+            return;
+        }
+
+        try {
             var hrIter = ActivityMonitor.getHeartRateHistory(1, true);
             var sample = hrIter.next();
             if (sample != null && sample.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
                 heartRate = sample.heartRate.format("%d");
-            } else { heartRate = "--"; }
+            } else {
+                heartRate = "--";
+            }
+        } catch (e) {
+            heartRate = "--";
         }
     }
 
@@ -154,16 +205,33 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
 
-    private function drawBlocks(dc, sinProgress) {
+    private function drawDate(dc) {
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(screenWidth / 2, 18, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+    private function drawBlocks(dc, bounceProgress, blockProgress) {
         var blockX = (screenWidth - 200) / 2;
-        var blockY = 80 - (15 * sinProgress).toNumber();
+        var blockY = 80 - (15 * bounceProgress).toNumber();
         if (blockBmp != null) {
             dc.drawBitmap(blockX, blockY, blockBmp);
             dc.drawBitmap(blockX + 100, blockY, blockBmp);
         }
+
+        var currentTextY = blockY + 30;
+        var previousTextY = currentTextY;
+        if (!marioIsDown) {
+            previousTextY = currentTextY - (TIME_SLIDE_DISTANCE * blockProgress).toNumber();
+            currentTextY = currentTextY + (TIME_SLIDE_DISTANCE * (1.0 - blockProgress)).toNumber();
+        }
+
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(blockX + 50, blockY + 30, timeFont, timeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(blockX + 150, blockY + 30, timeFont, timeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
+        if (!marioIsDown && previousTimeStr[0] != "") {
+            dc.drawText(blockX + 50, previousTextY, timeFont, previousTimeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(blockX + 150, previousTextY, timeFont, previousTimeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
+        }
+        dc.drawText(blockX + 50, currentTextY, timeFont, timeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + 150, currentTextY, timeFont, timeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     private function drawCharacter(dc, sinProgress) {
@@ -175,13 +243,46 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
 
+    private function drawBattery(dc) {
+        var batteryWidth = 26;
+        var batteryHeight = 12;
+        var batteryX = screenWidth - 42;
+        var batteryY = 14;
+        var fillWidth = (20 * batLevel / 100.0).toNumber();
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawRectangle(batteryX, batteryY, batteryWidth, batteryHeight);
+        dc.fillRectangle(batteryX + batteryWidth, batteryY + 3, 3, batteryHeight - 6);
+
+        if (fillWidth > 0) {
+            dc.fillRectangle(batteryX + 3, batteryY + 3, fillWidth, batteryHeight - 5);
+        }
+
+        if (isCharging) {
+            dc.drawText(batteryX + 10, batteryY - 2, Graphics.FONT_XTINY, "+", Graphics.TEXT_JUSTIFY_CENTER);
+        }
+    }
+
+    private function drawActivityMetrics(dc) {
+        if (iconsFont == null) { return; }
+
+        var centerY = screenHeight / 2;
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+
+        dc.drawText(30, centerY - 24, iconsFont, "s", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(30, centerY + 14, Graphics.FONT_XTINY, steps.format("%d"), Graphics.TEXT_JUSTIFY_CENTER);
+
+        dc.drawText(screenWidth - 30, centerY - 24, iconsFont, "p", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(screenWidth - 30, centerY + 14, Graphics.FONT_XTINY, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
     function startMarioJump() {
         if (!marioIsDown || inLowPower) { return; }
         try {
             marioIsDown = false;
             animationStartTime = System.getTimer();
             if (jumpTimer == null) { jumpTimer = new Timer.Timer(); }
-            jumpTimer.start(method(:onJumpUpdate), 33, true);
+            jumpTimer.start(method(:onJumpUpdate), JUMP_FRAME_INTERVAL_MS, true);
             WatchUi.requestUpdate();
         } catch (e) { stopAnimation(); }
     }
@@ -207,21 +308,45 @@ class MarioTimeView extends WatchUi.WatchFace {
         return (elapsed >= animationDuration) ? 1.0 : elapsed.toFloat() / animationDuration;
     }
 
+    function getBlockAnimationProgress(animationProgress) {
+        if (animationProgress <= BLOCK_ANIMATION_DELAY) { return 0.0; }
+
+        var adjusted = (animationProgress - BLOCK_ANIMATION_DELAY) / (1.0 - BLOCK_ANIMATION_DELAY);
+        if (adjusted >= 1.0) { return 1.0; }
+        return adjusted;
+    }
+
+    function getEffectiveCharacterIndex(now) {
+        if (now.month == APRIL_FOOLS_MONTH && now.day == APRIL_FOOLS_DAY) {
+            return 2;
+        }
+
+        return normalizeSettingValue(selectedCharacter, 0, CHARACTER_COUNT - 1, 0);
+    }
+
     function onEnterSleep() { inLowPower = true; stopAnimation(); }
     function onExitSleep() { inLowPower = false; WatchUi.requestUpdate(); }
     function onSettingsChanged() { loadSettings(); refreshResources(); WatchUi.requestUpdate(); }
 
-    function drawFitnessMetrics(dc) {
-        if (iconsFont == null) { return; }
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
-        if (isCharging) { batIcon = "l"; }
-        dc.drawText(screenWidth / 2, 15, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
-        var info = ActivityMonitor.getInfo();
-        var steps = (info != null && info.steps != null) ? info.steps : 0;
-        dc.drawText(35, screenHeight / 2 - 25, iconsFont, "s", Graphics.TEXT_JUSTIFY_LEFT);
-        dc.drawText(42, screenHeight / 2 + 15, Graphics.FONT_XTINY, steps.format("%d"), Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(screenWidth - 20, screenHeight / 2 - 25, iconsFont, "p", Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(screenWidth - 30, screenHeight / 2 + 15, Graphics.FONT_XTINY, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+    private function normalizeSettingValue(value, minValue, maxValue, defaultValue) {
+        var normalized = defaultValue;
+
+        if (value != null) {
+            if (value instanceof Lang.Number) {
+                normalized = value.toNumber();
+            } else if (value instanceof Lang.String) {
+                try {
+                    normalized = value.toNumber();
+                } catch (e) {
+                    normalized = defaultValue;
+                }
+            }
+        }
+
+        if (normalized < minValue || normalized > maxValue) {
+            return defaultValue;
+        }
+
+        return normalized;
     }
 }
