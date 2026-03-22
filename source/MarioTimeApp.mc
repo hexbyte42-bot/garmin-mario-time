@@ -23,7 +23,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     static const APRIL_FOOLS_DAY = 1;
     static const TIME_SLIDE_DISTANCE = 62;
     static const BLOCK_ANIMATION_DELAY = 0.44;
-    static const TEXT_ANIMATION_DELAY = 0.30;
     static const BOWSER_Y_OFFSET = 10;
 
     // Resource Constants to avoid runtime allocations
@@ -54,7 +53,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     var is24Hour = true;
     var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
     var previousTimeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
-    var dateStr = "";
     var batLevel = 0;
     var isCharging = false;
     var steps = 0;
@@ -75,7 +73,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         try { iconsFont = WatchUi.loadResource(Rez.Fonts.IconsFont); } catch (e) { iconsFont = null; }
         loadSettings();
         updateTimeStrings(now, false);
-        updateDateString(now);
         lastMinute = now.min;
         refreshResources();
         updateSystemStats();
@@ -102,17 +99,13 @@ class MarioTimeView extends WatchUi.WatchFace {
             charJump = WatchUi.loadResource(CHAR_RES[c][1]);
             blockBmp = WatchUi.loadResource(Rez.Drawables.block);
         } catch (e) {}
-        updateBackgroundResource();
+        updateBackgroundResource(Gregorian.info(Time.now(), Time.FORMAT_LONG));
     }
 
-    function updateBackgroundResource() {
+    function updateBackgroundResource(now) {
         var bgIndex;
         if (selectedBackground == 0) {
-            var hour = Gregorian.info(Time.now(), Time.FORMAT_SHORT).hour;
-            if (hour < 4) { bgIndex = 2; }
-            else if (hour < 8) { bgIndex = 3; }
-            else if (hour < 20) { bgIndex = 0; }
-            else { bgIndex = 1; }
+            bgIndex = getAutoBackgroundIndex(now);
         } else {
             bgIndex = selectedBackground - 1;
         }
@@ -126,12 +119,11 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
+        if (selectedBackground == 0) { updateBackgroundResource(now); }
 
         if (now.min != lastMinute) {
             updateTimeStrings(now, true);
-            updateDateString(now);
             updateSystemStats();
-            if (selectedBackground == 0) { updateBackgroundResource(); }
             if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
             if (!inLowPower) { startMarioJump(); }
             lastMinute = now.min;
@@ -141,8 +133,6 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         if (bgBmp != null) { dc.drawBitmap(0, 0, bgBmp); }
         else { dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK); dc.clear(); }
-
-        drawDate(dc);
 
         var animationProgress = getAnimationProgress();
         var marioProgress = (marioIsDown) ? 0.0 : Math.sin(animationProgress * Math.PI);
@@ -168,10 +158,6 @@ class MarioTimeView extends WatchUi.WatchFace {
             previousTimeStr[0] = timeStr[0];
             previousTimeStr[1] = timeStr[1];
         }
-    }
-
-    private function updateDateString(now) {
-        dateStr = Lang.format("$1$, $2$ $3$", [now.day_of_week, now.month, now.day.format("%02d")]);
     }
 
     private function updateSystemStats() {
@@ -207,11 +193,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
 
-    private function drawDate(dc) {
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth / 2, 42, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
-    }
-
     private function drawBlocks(dc, bounceProgress, blockProgress) {
         var blockX = (screenWidth - 200) / 2;
         var blockY = 80 - (15 * bounceProgress).toNumber();
@@ -222,10 +203,8 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         var currentTextY = blockY + 30;
         var previousTextY = currentTextY;
-        var textProgress = getTextAnimationProgress(getAnimationProgress());
         if (!marioIsDown) {
-            previousTextY = currentTextY - (TIME_SLIDE_DISTANCE * textProgress).toNumber();
-            currentTextY = currentTextY + (TIME_SLIDE_DISTANCE * (1.0 - textProgress)).toNumber();
+            previousTextY = currentTextY - TIME_SLIDE_DISTANCE;
         }
 
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
@@ -325,12 +304,12 @@ class MarioTimeView extends WatchUi.WatchFace {
         return adjusted;
     }
 
-    function getTextAnimationProgress(animationProgress) {
-        if (animationProgress <= TEXT_ANIMATION_DELAY) { return 0.0; }
-
-        var adjusted = (animationProgress - TEXT_ANIMATION_DELAY) / (1.0 - TEXT_ANIMATION_DELAY);
-        if (adjusted >= 1.0) { return 1.0; }
-        return adjusted;
+    function getAutoBackgroundIndex(now) {
+        var hour = now.hour;
+        if (hour >= 22 || hour < 6) { return 1; }
+        if (hour >= 18) { return 3; }
+        if (hour >= 12) { return 2; }
+        return 0;
     }
 
     function getEffectiveCharacterIndex(now) {
