@@ -52,7 +52,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     var lastMinute = -1;
     var is24Hour = true;
     var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
-    var previousTimeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
     var batLevel = 0;
     var isCharging = false;
     var steps = 0;
@@ -146,18 +145,10 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     private function updateTimeStrings(now, shouldAnimate) {
-        previousTimeStr[0] = timeStr[0];
-        previousTimeStr[1] = timeStr[1];
-
         var h = now.hour;
         if (!is24Hour) { h = (h > 12) ? h - 12 : (h == 0 ? 12 : h); }
         timeStr[0] = h.format("%02d");
         timeStr[1] = now.min.format("%02d");
-
-        if (!shouldAnimate || previousTimeStr[0] == "") {
-            previousTimeStr[0] = timeStr[0];
-            previousTimeStr[1] = timeStr[1];
-        }
     }
 
     private function updateSystemStats() {
@@ -200,20 +191,9 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.drawBitmap(blockX, blockY, blockBmp);
             dc.drawBitmap(blockX + 100, blockY, blockBmp);
         }
-
-        var currentTextY = blockY + 30;
-        var previousTextY = currentTextY;
-        if (!marioIsDown) {
-            previousTextY = currentTextY - TIME_SLIDE_DISTANCE;
-        }
-
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
-        if (!marioIsDown && previousTimeStr[0] != "") {
-            dc.drawText(blockX + 50, previousTextY, timeFont, previousTimeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
-            dc.drawText(blockX + 150, previousTextY, timeFont, previousTimeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
-        }
-        dc.drawText(blockX + 50, currentTextY, timeFont, timeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(blockX + 150, currentTextY, timeFont, timeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + 50, blockY + 30, timeFont, timeStr[0], Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(blockX + 150, blockY + 30, timeFont, timeStr[1], Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     private function drawCharacter(dc, sinProgress) {
@@ -228,25 +208,11 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     private function drawBattery(dc) {
-        var batteryWidth = 26;
-        var batteryHeight = 12;
-        var batteryX = screenWidth - 42;
-        var batteryY = 14;
-        var fillWidth = (20 * batLevel / 100.0).toNumber();
-        var batteryLabelX = batteryX - 6;
-
+        if (iconsFont == null) { return; }
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(batteryLabelX, batteryY - 1, Graphics.FONT_XTINY, batLevel.format("%d"), Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawRectangle(batteryX, batteryY, batteryWidth, batteryHeight);
-        dc.fillRectangle(batteryX + batteryWidth, batteryY + 3, 3, batteryHeight - 6);
-
-        if (fillWidth > 0) {
-            dc.fillRectangle(batteryX + 3, batteryY + 3, fillWidth, batteryHeight - 5);
-        }
-
-        if (isCharging) {
-            dc.drawText(batteryX + 10, batteryY - 2, Graphics.FONT_XTINY, "+", Graphics.TEXT_JUSTIFY_CENTER);
-        }
+        var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
+        if (isCharging) { batIcon = "l"; }
+        dc.drawText(screenWidth / 2, 15, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     private function drawActivityMetrics(dc) {
@@ -307,8 +273,8 @@ class MarioTimeView extends WatchUi.WatchFace {
     function getAutoBackgroundIndex(now) {
         var hour = now.hour;
         if (hour >= 22 || hour < 6) { return 1; }
+        if (hour >= 12 && hour < 18) { return 2; }
         if (hour >= 18) { return 3; }
-        if (hour >= 12) { return 2; }
         return 0;
     }
 
