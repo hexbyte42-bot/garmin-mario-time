@@ -46,11 +46,13 @@ class MarioTimeView extends WatchUi.WatchFace {
     var animationStartTime = 0;
     var animationDuration = 400;
     var jumpTimer = null;
+    var minuteCheckTimer = null;
     
     // Cached values (UI Performance)
     var screenWidth, screenHeight;
     var lastMinute = -1;
     var is24Hour = true;
+    var suppressNextMinuteJump = false;
     var timeStr as Lang.Array<Lang.String> = ["", ""] as Lang.Array<Lang.String>;
     var batLevel = 0;
     var isCharging = false;
@@ -75,6 +77,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         lastMinute = now.min;
         refreshResources();
         updateSystemStats();
+        startMinuteChecker();
     }
 
     function loadSettings() {
@@ -114,19 +117,20 @@ class MarioTimeView extends WatchUi.WatchFace {
         try { bgBmp = WatchUi.loadResource(BG_RES[bgIndex]); } catch (e) { bgBmp = null; }
     }
 
-    function onHide() { stopAnimation(); }
+    function onHide() {
+        stopAnimation();
+        stopMinuteChecker();
+        suppressNextMinuteJump = true;
+    }
 
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
         if (selectedBackground == 0) { updateBackgroundResource(now); }
 
         if (now.min != lastMinute) {
-            updateTimeStrings(now, true);
-            updateSystemStats();
-            if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
-            if (!inLowPower) { startMarioJump(); }
-            lastMinute = now.min;
+            handleMinuteChange(now, !suppressNextMinuteJump);
         }
+        suppressNextMinuteJump = false;
 
         handleSafetyCheck();
 
@@ -241,6 +245,43 @@ class MarioTimeView extends WatchUi.WatchFace {
         } catch (e) { stopAnimation(); }
     }
 
+    function startMinuteChecker() {
+        if (inLowPower) { return; }
+        if (minuteCheckTimer != null) { return; }
+
+        try {
+            minuteCheckTimer = new Timer.Timer();
+            minuteCheckTimer.start(method(:onMinuteCheck), 1000, true);
+        } catch (e) {
+            minuteCheckTimer = null;
+        }
+    }
+
+    function stopMinuteChecker() {
+        if (minuteCheckTimer != null) {
+            try { minuteCheckTimer.stop(); } catch (e) {}
+            minuteCheckTimer = null;
+        }
+    }
+
+    function onMinuteCheck() as Void {
+        if (inLowPower) { return; }
+
+        var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
+        if (now.min != lastMinute) {
+            WatchUi.requestUpdate();
+        }
+    }
+
+    function handleMinuteChange(now, shouldAnimate) {
+        updateTimeStrings(now, true);
+        updateSystemStats();
+        if (selectedBackground == 0) { updateBackgroundResource(now); }
+        if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
+        if (shouldAnimate && !inLowPower) { startMarioJump(); }
+        lastMinute = now.min;
+    }
+
     function stopAnimation() {
         marioIsDown = true;
         animationStartTime = 0;
@@ -286,8 +327,18 @@ class MarioTimeView extends WatchUi.WatchFace {
         return normalizeSettingValue(selectedCharacter, 0, CHARACTER_COUNT - 1, 0);
     }
 
-    function onEnterSleep() { inLowPower = true; stopAnimation(); }
-    function onExitSleep() { inLowPower = false; WatchUi.requestUpdate(); }
+    function onEnterSleep() {
+        inLowPower = true;
+        stopAnimation();
+        stopMinuteChecker();
+        suppressNextMinuteJump = true;
+    }
+
+    function onExitSleep() {
+        inLowPower = false;
+        startMinuteChecker();
+        WatchUi.requestUpdate();
+    }
     function onSettingsChanged() { loadSettings(); refreshResources(); WatchUi.requestUpdate(); }
 
     private function normalizeSettingValue(value, minValue, maxValue, defaultValue) {
