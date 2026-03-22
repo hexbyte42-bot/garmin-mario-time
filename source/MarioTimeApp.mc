@@ -23,6 +23,8 @@ class MarioTimeView extends WatchUi.WatchFace {
     static const APRIL_FOOLS_DAY = 1;
     static const TIME_SLIDE_DISTANCE = 62;
     static const BLOCK_ANIMATION_DELAY = 0.44;
+    static const TEXT_ANIMATION_DELAY = 0.30;
+    static const BOWSER_Y_OFFSET = 10;
 
     // Resource Constants to avoid runtime allocations
     static const CHAR_RES = [
@@ -207,7 +209,7 @@ class MarioTimeView extends WatchUi.WatchFace {
 
     private function drawDate(dc) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth / 2, 18, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(screenWidth / 2, 42, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     private function drawBlocks(dc, bounceProgress, blockProgress) {
@@ -220,9 +222,10 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         var currentTextY = blockY + 30;
         var previousTextY = currentTextY;
+        var textProgress = getTextAnimationProgress(getAnimationProgress());
         if (!marioIsDown) {
-            previousTextY = currentTextY - (TIME_SLIDE_DISTANCE * blockProgress).toNumber();
-            currentTextY = currentTextY + (TIME_SLIDE_DISTANCE * (1.0 - blockProgress)).toNumber();
+            previousTextY = currentTextY - (TIME_SLIDE_DISTANCE * textProgress).toNumber();
+            currentTextY = currentTextY + (TIME_SLIDE_DISTANCE * (1.0 - textProgress)).toNumber();
         }
 
         dc.setColor(0x753A00, Graphics.COLOR_TRANSPARENT);
@@ -238,7 +241,9 @@ class MarioTimeView extends WatchUi.WatchFace {
         var bmp = marioIsDown ? charNormal : charJump;
         if (bmp != null) {
             var charX = (screenWidth - 120) / 2;
-            var charY = 255 - (60 * sinProgress).toNumber();
+            var baseY = 255;
+            if (activeCharacterIndex == 2) { baseY -= BOWSER_Y_OFFSET; }
+            var charY = baseY - (60 * sinProgress).toNumber();
             dc.drawBitmap(charX, charY, bmp);
         }
     }
@@ -249,8 +254,10 @@ class MarioTimeView extends WatchUi.WatchFace {
         var batteryX = screenWidth - 42;
         var batteryY = 14;
         var fillWidth = (20 * batLevel / 100.0).toNumber();
+        var batteryLabelX = batteryX - 6;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(batteryLabelX, batteryY - 1, Graphics.FONT_XTINY, batLevel.format("%d"), Graphics.TEXT_JUSTIFY_RIGHT);
         dc.drawRectangle(batteryX, batteryY, batteryWidth, batteryHeight);
         dc.fillRectangle(batteryX + batteryWidth, batteryY + 3, 3, batteryHeight - 6);
 
@@ -267,13 +274,15 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (iconsFont == null) { return; }
 
         var centerY = screenHeight / 2;
+        var leftMetricX = 42;
+        var rightMetricX = screenWidth - 42;
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        dc.drawText(30, centerY - 24, iconsFont, "s", Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(30, centerY + 14, Graphics.FONT_XTINY, steps.format("%d"), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(leftMetricX, centerY - 24, iconsFont, "s", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(leftMetricX, centerY + 14, Graphics.FONT_XTINY, steps.format("%d"), Graphics.TEXT_JUSTIFY_CENTER);
 
-        dc.drawText(screenWidth - 30, centerY - 24, iconsFont, "p", Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(screenWidth - 30, centerY + 14, Graphics.FONT_XTINY, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(rightMetricX, centerY - 24, iconsFont, "p", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(rightMetricX, centerY + 14, Graphics.FONT_XTINY, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     function startMarioJump() {
@@ -312,6 +321,14 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (animationProgress <= BLOCK_ANIMATION_DELAY) { return 0.0; }
 
         var adjusted = (animationProgress - BLOCK_ANIMATION_DELAY) / (1.0 - BLOCK_ANIMATION_DELAY);
+        if (adjusted >= 1.0) { return 1.0; }
+        return adjusted;
+    }
+
+    function getTextAnimationProgress(animationProgress) {
+        if (animationProgress <= TEXT_ANIMATION_DELAY) { return 0.0; }
+
+        var adjusted = (animationProgress - TEXT_ANIMATION_DELAY) / (1.0 - TEXT_ANIMATION_DELAY);
         if (adjusted >= 1.0) { return 1.0; }
         return adjusted;
     }
