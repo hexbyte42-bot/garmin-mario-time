@@ -21,7 +21,7 @@ class MarioTimeApp extends Application.AppBase {
     }
 
     function getSettingsView() {
-        return [new MarioTimeSettingsView(), new MarioTimeSettingsDelegate()];
+        return [new MarioTimeSettingsMenu(), new MarioTimeSettingsMenuDelegate()];
     }
 
     function onSettingsChanged() {
@@ -382,37 +382,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
 
         return normalized;
-    }
-}
-
-class MarioTimeSettingsView extends WatchUi.View {
-    function initialize() {
-        View.initialize();
-    }
-
-    function onUpdate(dc as Graphics.Dc) as Void {
-        dc.clearClip();
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
-        dc.clear();
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            dc.getWidth() / 2,
-            dc.getHeight() / 2,
-            Graphics.FONT_SMALL,
-            "Press Menu\nfor settings",
-            Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
-        );
-    }
-}
-
-class MarioTimeSettingsDelegate extends WatchUi.BehaviorDelegate {
-    function initialize() {
-        BehaviorDelegate.initialize();
-    }
-
-    function onMenu() as Lang.Boolean {
-        WatchUi.pushView(new MarioTimeSettingsMenu(), new MarioTimeSettingsMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
-        return true;
     }
 }
 
