@@ -13,18 +13,18 @@ using Toybox.Math;
 class MarioTimeApp extends Application.AppBase {
     var watchFaceView = null;
 
-    function initialize() { AppBase.initialize(); }
+    public function initialize() { AppBase.initialize(); }
 
-    function getInitialView() {
+    public function getInitialView() {
         watchFaceView = new MarioTimeView();
         return [watchFaceView];
     }
 
-    function getSettingsView() {
+    public function getSettingsView() {
         return [new MarioTimeSettingsMenu(), new MarioTimeSettingsMenuDelegate()];
     }
 
-    function onSettingsChanged() {
+    public function onSettingsChanged() {
         if (watchFaceView != null) {
             watchFaceView.reloadSettings();
         }
@@ -386,7 +386,7 @@ class MarioTimeView extends WatchUi.WatchFace {
 }
 
 class MarioTimeSettingsMenu extends WatchUi.Menu2 {
-    function initialize() {
+    public function initialize() {
         Menu2.initialize({:title=>"Settings"});
         addItem(new WatchUi.MenuItem("Character", MarioTimeSettingsSupport.getCharacterLabel(), "character", null));
         addItem(new WatchUi.MenuItem("Background", MarioTimeSettingsSupport.getBackgroundLabel(), "background", null));
@@ -394,11 +394,11 @@ class MarioTimeSettingsMenu extends WatchUi.Menu2 {
 }
 
 class MarioTimeSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
-    function initialize() {
+    public function initialize() {
         Menu2InputDelegate.initialize();
     }
 
-    function onSelect(menuItem as WatchUi.MenuItem) as Void {
+    public function onSelect(menuItem as WatchUi.MenuItem) as Void {
         var itemId = menuItem.getId();
         if (itemId == "character") {
             MarioTimeSettingsSupport.setCharacterValue(MarioTimeSettingsSupport.nextCharacterValue());
