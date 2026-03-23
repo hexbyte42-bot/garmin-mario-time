@@ -401,52 +401,12 @@ class MarioTimeSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
     function onSelect(menuItem as WatchUi.MenuItem) as Void {
         var itemId = menuItem.getId();
         if (itemId == "character") {
-            WatchUi.pushView(new MarioTimeCharacterMenu(), new MarioTimeCharacterMenuDelegate(), WatchUi.SLIDE_LEFT);
+            MarioTimeSettingsSupport.setCharacterValue(MarioTimeSettingsSupport.nextCharacterValue());
+            menuItem.setSubLabel(MarioTimeSettingsSupport.getCharacterLabel());
         } else if (itemId == "background") {
-            WatchUi.pushView(new MarioTimeBackgroundMenu(), new MarioTimeBackgroundMenuDelegate(), WatchUi.SLIDE_LEFT);
+            MarioTimeSettingsSupport.setBackgroundValue(MarioTimeSettingsSupport.nextBackgroundValue());
+            menuItem.setSubLabel(MarioTimeSettingsSupport.getBackgroundLabel());
         }
-    }
-}
-
-class MarioTimeCharacterMenu extends WatchUi.Menu2 {
-    function initialize() {
-        Menu2.initialize({:title=>"Character"});
-        addItem(new WatchUi.MenuItem("Mario", null, 0, null));
-        addItem(new WatchUi.MenuItem("Luigi", null, 1, null));
-        addItem(new WatchUi.MenuItem("Bowser", null, 2, null));
-    }
-}
-
-class MarioTimeCharacterMenuDelegate extends WatchUi.Menu2InputDelegate {
-    function initialize() {
-        Menu2InputDelegate.initialize();
-    }
-
-    function onSelect(menuItem as WatchUi.MenuItem) as Void {
-        MarioTimeSettingsSupport.setCharacterValue(menuItem.getId() as Lang.Number);
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
-    }
-}
-
-class MarioTimeBackgroundMenu extends WatchUi.Menu2 {
-    function initialize() {
-        Menu2.initialize({:title=>"Background"});
-        addItem(new WatchUi.MenuItem("Auto", null, 0, null));
-        addItem(new WatchUi.MenuItem("Day", null, 1, null));
-        addItem(new WatchUi.MenuItem("Night", null, 2, null));
-        addItem(new WatchUi.MenuItem("Underground", null, 3, null));
-        addItem(new WatchUi.MenuItem("Castle", null, 4, null));
-    }
-}
-
-class MarioTimeBackgroundMenuDelegate extends WatchUi.Menu2InputDelegate {
-    function initialize() {
-        Menu2InputDelegate.initialize();
-    }
-
-    function onSelect(menuItem as WatchUi.MenuItem) as Void {
-        MarioTimeSettingsSupport.setBackgroundValue(menuItem.getId() as Lang.Number);
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
     }
 }
 
@@ -477,6 +437,18 @@ module MarioTimeSettingsSupport {
         if (value == 3) { return "Underground"; }
         if (value == 4) { return "Castle"; }
         return "Auto";
+    }
+
+    function nextCharacterValue() {
+        var value = getCharacterValue() + 1;
+        if (value > 2) { return 0; }
+        return value;
+    }
+
+    function nextBackgroundValue() {
+        var value = getBackgroundValue() + 1;
+        if (value > 4) { return 0; }
+        return value;
     }
 
     function setCharacterValue(value as Lang.Number) as Void {
