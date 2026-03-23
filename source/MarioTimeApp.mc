@@ -11,8 +11,24 @@ using Toybox.ActivityMonitor;
 using Toybox.Math;
 
 class MarioTimeApp extends Application.AppBase {
+    var watchFaceView = null;
+
     function initialize() { AppBase.initialize(); }
-    function getInitialView() { return [new MarioTimeView()]; }
+
+    function getInitialView() {
+        watchFaceView = new MarioTimeView();
+        return [watchFaceView];
+    }
+
+    function getSettingsView() {
+        return [new MarioTimeSettingsView(), new MarioTimeSettingsDelegate()];
+    }
+
+    function onSettingsChanged() {
+        if (watchFaceView != null) {
+            watchFaceView.reloadSettings();
+        }
+    }
 }
 
 class MarioTimeView extends WatchUi.WatchFace {
@@ -65,6 +81,13 @@ class MarioTimeView extends WatchUi.WatchFace {
     var activeCharacterIndex = -1;
 
     function initialize() { WatchFace.initialize(); }
+
+    function reloadSettings() {
+        loadSettings();
+        refreshResources();
+        updateSystemStats();
+        WatchUi.requestUpdate();
+    }
 
     function onLayout(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
@@ -339,8 +362,6 @@ class MarioTimeView extends WatchUi.WatchFace {
         startMinuteChecker();
         WatchUi.requestUpdate();
     }
-    function onSettingsChanged() { loadSettings(); refreshResources(); WatchUi.requestUpdate(); }
-
     private function normalizeSettingValue(value, minValue, maxValue, defaultValue) {
         var normalized = defaultValue;
 
@@ -361,5 +382,170 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
 
         return normalized;
+    }
+}
+
+class MarioTimeSettingsView extends WatchUi.View {
+    function initialize() {
+        View.initialize();
+    }
+
+    function onUpdate(dc as Graphics.Dc) as Void {
+        dc.clearClip();
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            dc.getWidth() / 2,
+            dc.getHeight() / 2,
+            Graphics.FONT_SMALL,
+            "Press Menu\nfor settings",
+            Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+        );
+    }
+}
+
+class MarioTimeSettingsDelegate extends WatchUi.BehaviorDelegate {
+    function initialize() {
+        BehaviorDelegate.initialize();
+    }
+
+    function onMenu() as Lang.Boolean {
+        WatchUi.pushView(new MarioTimeSettingsMenu(), new MarioTimeSettingsMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+}
+
+class MarioTimeSettingsMenu extends WatchUi.Menu2 {
+    function initialize() {
+        Menu2.initialize({:title=>"Settings"});
+        addItem(new WatchUi.MenuItem("Character", MarioTimeSettingsSupport.getCharacterLabel(), "character", null));
+        addItem(new WatchUi.MenuItem("Background", MarioTimeSettingsSupport.getBackgroundLabel(), "background", null));
+    }
+}
+
+class MarioTimeSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
+    function initialize() {
+        Menu2InputDelegate.initialize();
+    }
+
+    function onSelect(menuItem as WatchUi.MenuItem) as Void {
+        var itemId = menuItem.getId();
+        if (itemId == "character") {
+            WatchUi.pushView(new MarioTimeCharacterMenu(), new MarioTimeCharacterMenuDelegate(), WatchUi.SLIDE_LEFT);
+        } else if (itemId == "background") {
+            WatchUi.pushView(new MarioTimeBackgroundMenu(), new MarioTimeBackgroundMenuDelegate(), WatchUi.SLIDE_LEFT);
+        }
+    }
+}
+
+class MarioTimeCharacterMenu extends WatchUi.Menu2 {
+    function initialize() {
+        Menu2.initialize({:title=>"Character"});
+        addItem(new WatchUi.MenuItem("Mario", null, 0, null));
+        addItem(new WatchUi.MenuItem("Luigi", null, 1, null));
+        addItem(new WatchUi.MenuItem("Bowser", null, 2, null));
+    }
+}
+
+class MarioTimeCharacterMenuDelegate extends WatchUi.Menu2InputDelegate {
+    function initialize() {
+        Menu2InputDelegate.initialize();
+    }
+
+    function onSelect(menuItem as WatchUi.MenuItem) as Void {
+        MarioTimeSettingsSupport.setCharacterValue(menuItem.getId() as Lang.Number);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+class MarioTimeBackgroundMenu extends WatchUi.Menu2 {
+    function initialize() {
+        Menu2.initialize({:title=>"Background"});
+        addItem(new WatchUi.MenuItem("Auto", null, 0, null));
+        addItem(new WatchUi.MenuItem("Day", null, 1, null));
+        addItem(new WatchUi.MenuItem("Night", null, 2, null));
+        addItem(new WatchUi.MenuItem("Underground", null, 3, null));
+        addItem(new WatchUi.MenuItem("Castle", null, 4, null));
+    }
+}
+
+class MarioTimeBackgroundMenuDelegate extends WatchUi.Menu2InputDelegate {
+    function initialize() {
+        Menu2InputDelegate.initialize();
+    }
+
+    function onSelect(menuItem as WatchUi.MenuItem) as Void {
+        MarioTimeSettingsSupport.setBackgroundValue(menuItem.getId() as Lang.Number);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+module MarioTimeSettingsSupport {
+    function getCharacterValue() {
+        var value;
+        try { value = Application.Properties.getValue("character"); } catch (e) { value = 0; }
+        return normalizeSettingValue(value, 0, 2, 0);
+    }
+
+    function getBackgroundValue() {
+        var value;
+        try { value = Application.Properties.getValue("background"); } catch (e) { value = 0; }
+        return normalizeSettingValue(value, 0, 4, 0);
+    }
+
+    function getCharacterLabel() {
+        var value = getCharacterValue();
+        if (value == 1) { return "Luigi"; }
+        if (value == 2) { return "Bowser"; }
+        return "Mario";
+    }
+
+    function getBackgroundLabel() {
+        var value = getBackgroundValue();
+        if (value == 1) { return "Day"; }
+        if (value == 2) { return "Night"; }
+        if (value == 3) { return "Underground"; }
+        if (value == 4) { return "Castle"; }
+        return "Auto";
+    }
+
+    function setCharacterValue(value as Lang.Number) as Void {
+        Application.Properties.setValue("character", normalizeSettingValue(value, 0, 2, 0));
+        refreshWatchFace();
+    }
+
+    function setBackgroundValue(value as Lang.Number) as Void {
+        Application.Properties.setValue("background", normalizeSettingValue(value, 0, 4, 0));
+        refreshWatchFace();
+    }
+
+    function normalizeSettingValue(value, minValue as Lang.Number, maxValue as Lang.Number, defaultValue as Lang.Number) as Lang.Number {
+        var normalized = defaultValue;
+
+        if (value != null) {
+            if (value instanceof Lang.Number) {
+                normalized = value.toNumber();
+            } else if (value instanceof Lang.String) {
+                try {
+                    normalized = value.toNumber();
+                } catch (e) {
+                    normalized = defaultValue;
+                }
+            }
+        }
+
+        if (normalized < minValue || normalized > maxValue) {
+            return defaultValue;
+        }
+
+        return normalized;
+    }
+
+    function refreshWatchFace() as Void {
+        var app = Application.getApp() as MarioTimeApp;
+        if (app != null) {
+            app.onSettingsChanged();
+        }
     }
 }
