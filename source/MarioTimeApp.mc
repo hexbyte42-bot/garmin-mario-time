@@ -400,10 +400,10 @@ class MarioTimeSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
 
     public function onSelect(menuItem as WatchUi.MenuItem) as Void {
         var itemId = menuItem.getId();
-        if (itemId == "character") {
+        if ("character".equals(itemId)) {
             var holder = MarioTimeSettingsSupport.characterHolder();
             WatchUi.pushView(new MarioTimeOptionsMenu(holder, menuItem.getLabel()), new MarioTimeOptionsMenuDelegate(menuItem, holder), WatchUi.SLIDE_LEFT);
-        } else if (itemId == "background") {
+        } else if ("background".equals(itemId)) {
             var holder = MarioTimeSettingsSupport.backgroundHolder();
             WatchUi.pushView(new MarioTimeOptionsMenu(holder, menuItem.getLabel()), new MarioTimeOptionsMenuDelegate(menuItem, holder), WatchUi.SLIDE_LEFT);
         }
