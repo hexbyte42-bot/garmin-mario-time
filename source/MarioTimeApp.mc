@@ -401,12 +401,76 @@ class MarioTimeSettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
     public function onSelect(menuItem as WatchUi.MenuItem) as Void {
         var itemId = menuItem.getId();
         if (itemId == "character") {
-            MarioTimeSettingsSupport.setCharacterValue(MarioTimeSettingsSupport.nextCharacterValue());
-            menuItem.setSubLabel(MarioTimeSettingsSupport.getCharacterLabel());
+            var holder = MarioTimeSettingsSupport.characterHolder();
+            WatchUi.pushView(new MarioTimeOptionsMenu(holder, menuItem.getLabel()), new MarioTimeOptionsMenuDelegate(menuItem, holder), WatchUi.SLIDE_LEFT);
         } else if (itemId == "background") {
-            MarioTimeSettingsSupport.setBackgroundValue(MarioTimeSettingsSupport.nextBackgroundValue());
-            menuItem.setSubLabel(MarioTimeSettingsSupport.getBackgroundLabel());
+            var holder = MarioTimeSettingsSupport.backgroundHolder();
+            WatchUi.pushView(new MarioTimeOptionsMenu(holder, menuItem.getLabel()), new MarioTimeOptionsMenuDelegate(menuItem, holder), WatchUi.SLIDE_LEFT);
         }
+    }
+
+    public function onBack() as Void {
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+class MarioTimeOptionsMenu extends WatchUi.Menu2 {
+    public function initialize(holder as MarioTimeOptionsHolder, title as Lang.String) {
+        Menu2.initialize({:title=>title, :focus=>holder.getCurrentIndex()});
+
+        for (var i = 0; i < holder.getSize(); i++) {
+            addItem(new WatchUi.MenuItem(holder.getLabel(i), null, i, null));
+        }
+    }
+}
+
+class MarioTimeOptionsMenuDelegate extends WatchUi.Menu2InputDelegate {
+    hidden var parentItem as WatchUi.MenuItem;
+    hidden var holder as MarioTimeOptionsHolder;
+
+    public function initialize(parent as WatchUi.MenuItem, optionsHolder as MarioTimeOptionsHolder) {
+        Menu2InputDelegate.initialize();
+        parentItem = parent;
+        holder = optionsHolder;
+    }
+
+    public function onSelect(item as WatchUi.MenuItem) as Void {
+        var index = item.getId() as Lang.Number;
+        holder.save(index);
+        parentItem.setSubLabel(holder.getLabel(index));
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+    }
+
+    public function onBack() as Void {
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+class MarioTimeOptionsHolder {
+    hidden var settingId as Lang.String;
+    hidden var labels as Lang.Array<Lang.String>;
+
+    public function initialize(id as Lang.String, optionLabels as Lang.Array<Lang.String>) {
+        settingId = id;
+        labels = optionLabels;
+    }
+
+    public function getLabel(index as Lang.Number) as Lang.String {
+        return labels[index];
+    }
+
+    public function getSize() as Lang.Number {
+        return labels.size();
+    }
+
+    public function getCurrentIndex() as Lang.Number {
+        var value;
+        try { value = Application.Properties.getValue(settingId); } catch (e) { value = 0; }
+        return MarioTimeSettingsSupport.normalizeSettingValue(value, 0, labels.size() - 1, 0);
+    }
+
+    public function save(index as Lang.Number) as Void {
+        Application.Properties.setValue(settingId, MarioTimeSettingsSupport.normalizeSettingValue(index, 0, labels.size() - 1, 0));
     }
 }
 
@@ -439,26 +503,12 @@ module MarioTimeSettingsSupport {
         return "Auto";
     }
 
-    function nextCharacterValue() {
-        var value = getCharacterValue() + 1;
-        if (value > 2) { return 0; }
-        return value;
+    function characterHolder() as MarioTimeOptionsHolder {
+        return new MarioTimeOptionsHolder("character", ["Mario", "Luigi", "Bowser"] as Lang.Array<Lang.String>);
     }
 
-    function nextBackgroundValue() {
-        var value = getBackgroundValue() + 1;
-        if (value > 4) { return 0; }
-        return value;
-    }
-
-    function setCharacterValue(value as Lang.Number) as Void {
-        Application.Properties.setValue("character", normalizeSettingValue(value, 0, 2, 0));
-        refreshWatchFace();
-    }
-
-    function setBackgroundValue(value as Lang.Number) as Void {
-        Application.Properties.setValue("background", normalizeSettingValue(value, 0, 4, 0));
-        refreshWatchFace();
+    function backgroundHolder() as MarioTimeOptionsHolder {
+        return new MarioTimeOptionsHolder("background", ["Auto", "Day", "Night", "Underground", "Castle"] as Lang.Array<Lang.String>);
     }
 
     function normalizeSettingValue(value, minValue as Lang.Number, maxValue as Lang.Number, defaultValue as Lang.Number) as Lang.Number {
@@ -481,12 +531,5 @@ module MarioTimeSettingsSupport {
         }
 
         return normalized;
-    }
-
-    function refreshWatchFace() as Void {
-        var app = Application.getApp() as MarioTimeApp;
-        if (app != null) {
-            app.onSettingsChanged();
-        }
     }
 }
