@@ -15,23 +15,22 @@ The implementation is intentionally split between:
 
 - 12/24 hour support
 - Minute-based Mario jump animation
-- Delayed block bounce and sliding time transition
-- Date row
+- Delayed block bounce with synchronized time movement
 - Character selection: Mario, Luigi, Bowser
 - April 1 Bowser override
 - Automatic and manual background selection
 - Watch battery indicator
 - Garmin activity metrics: steps and heart rate
+- On-device settings menu for character and background
 
 ### Known Constraints
 
-- No device-side menu implementation
-- Settings are currently driven through Connect IQ settings
 - Pebble companion features are not implemented:
   - phone battery
   - weather
   - Bluetooth disconnect icon
   - vibration alerts
+- The date row is intentionally removed on FR265 to keep the battery indicator visible
 
 ## Development Environment
 
@@ -98,8 +97,7 @@ When changing the watchface, preserve or improve these upstream Pebble traits:
 
 - Mario jumps every minute
 - Question blocks bounce after the jump starts
-- The time transitions during the bounce
-- The date stays visible in the upper area
+- The time moves with the blocks during the bounce
 - Background changes follow the original Pebble schedule
 - April 1 forces Bowser
 
@@ -109,7 +107,7 @@ Garmin-specific additions are acceptable if they do not overwhelm the original c
 
 - The project must compile cleanly.
 - Minute transition behavior must be checked through a full animation cycle.
-- Character switching must be validated through settings changes.
+- Character switching must be validated through both Connect IQ settings and on-device settings.
 - Background switching must be checked in both auto and manual modes.
 - Battery, steps, and heart rate should degrade gracefully when data is unavailable.
 
@@ -133,7 +131,7 @@ Garmin-specific additions are acceptable if they do not overwhelm the original c
 ### Runtime Issues
 
 - Animation gets stuck: verify timer stop/reset logic
-- Character or background changes do not apply: verify settings normalization and `onSettingsChanged()`
+- Character or background changes do not apply: verify settings normalization, `onSettingsChanged()`, and string id comparisons in the on-device settings delegate
 - Missing resources: verify bitmap IDs and filenames in `resources/resources.xml`
 - Missing heart rate: fall back cleanly when current or historical HR data is unavailable
 
@@ -152,4 +150,4 @@ Garmin-specific additions are acceptable if they do not overwhelm the original c
 
 ---
 
-Last updated: 2026-03-21
+Last updated: 2026-03-23

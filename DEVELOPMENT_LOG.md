@@ -28,7 +28,6 @@ This project ports the Pebble Time Mario watchface to the Garmin Forerunner 265.
 - 12/24 hour display support
 - Two-block time layout
 - Minute jump animation
-- Date row
 - Automatic and manual backgrounds
 - Character switching
 - April 1 Bowser override
@@ -71,6 +70,25 @@ Fix:
 Result:
 - Character switching is stable on-device for valid settings values
 
+### On-device settings
+
+Problem:
+- Sideloaded builds could not be configured from Garmin Connect
+- Early watch-side settings attempts rendered but did not react to selection on the device
+
+Root cause:
+- The watch face used `getSettingsView()`, but the menu delegate compared string ids with `==`
+- In practice, the settings rows appeared on-device but the branch logic did not fire reliably
+
+Fix:
+- Keep the `getSettingsView()` + `Menu2` approach
+- Refactor the settings flow to match the working Protomolecule watch face pattern
+- Compare menu ids with `.equals(...)` instead of `==`
+
+Result:
+- On-device settings now work on FR265 hardware
+- Character and background can be changed directly from the watch face settings menu
+
 ### Pebble parity improvements
 
 Implemented:
@@ -80,17 +98,6 @@ Implemented:
 - Time slide and delayed block bounce restored
 
 ## Removed or Deferred Features
-
-### Device-side menu
-
-Status:
-- Deferred
-
-Reason:
-- Previous device-side settings work was unstable
-
-Current approach:
-- Use Connect IQ settings instead
 
 ### Pebble companion features
 
