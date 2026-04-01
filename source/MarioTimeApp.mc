@@ -36,6 +36,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     static const BACKGROUND_COUNT = 4;
     static const JUMP_FRAME_INTERVAL_MS = 67;
     static const APRIL_FOOLS_MONTH = 4;
+    static const APRIL_FOOLS_MONTH_SYMBOL = :april;
     static const APRIL_FOOLS_DAY = 1;
     static const TIME_SLIDE_DISTANCE = 62;
     static const BLOCK_ANIMATION_DELAY = 0.44;
@@ -149,6 +150,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
         if (selectedBackground == 0) { updateBackgroundResource(now); }
+        if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
 
         if (now.min != lastMinute) {
             handleMinuteChange(now, !suppressNextMinuteJump);
@@ -343,11 +345,22 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function getEffectiveCharacterIndex(now) {
-        if (now.month == APRIL_FOOLS_MONTH && now.day == APRIL_FOOLS_DAY) {
+        if (isAprilFoolsDay(now)) {
             return 2;
         }
 
         return normalizeSettingValue(selectedCharacter, 0, CHARACTER_COUNT - 1, 0);
+    }
+
+    function isAprilFoolsDay(now) {
+        var isApril = false;
+        if (now.month instanceof Lang.Number) {
+            isApril = now.month.toNumber() == APRIL_FOOLS_MONTH;
+        } else {
+            isApril = now.month == APRIL_FOOLS_MONTH_SYMBOL;
+        }
+
+        return isApril && now.day == APRIL_FOOLS_DAY;
     }
 
     function onEnterSleep() {
@@ -360,6 +373,9 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onExitSleep() {
         inLowPower = false;
         startMinuteChecker();
+        // Force a non-animated refresh after wake even if the minute value matches
+        // the last visible minute from before sleep.
+        lastMinute = -1;
         WatchUi.requestUpdate();
     }
     private function normalizeSettingValue(value, minValue, maxValue, defaultValue) {
