@@ -149,7 +149,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onUpdate(dc) {
         var now = Gregorian.info(Time.now(), Time.FORMAT_LONG);
         if (selectedBackground == 0) { updateBackgroundResource(now); }
-        if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
 
         if (now.min != lastMinute) {
             handleMinuteChange(now, !suppressNextMinuteJump);
@@ -381,9 +380,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     function onExitSleep() {
         inLowPower = false;
         startMinuteChecker();
-        // Force a non-animated refresh after wake even if the minute value matches
-        // the last visible minute from before sleep.
-        lastMinute = -1;
         WatchUi.requestUpdate();
     }
     private function normalizeSettingValue(value, minValue, maxValue, defaultValue) {
