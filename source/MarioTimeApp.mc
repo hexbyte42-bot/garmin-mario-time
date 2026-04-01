@@ -343,11 +343,31 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function getEffectiveCharacterIndex(now) {
-        if (now.month == APRIL_FOOLS_MONTH && now.day == APRIL_FOOLS_DAY) {
+        if (isAprilFoolsDay(now)) {
             return 2;
         }
 
         return normalizeSettingValue(selectedCharacter, 0, CHARACTER_COUNT - 1, 0);
+    }
+
+    function isAprilFoolsDay(now) {
+        try {
+            var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+            return (shortInfo.month as Lang.Number).toNumber() == APRIL_FOOLS_MONTH &&
+                (shortInfo.day as Lang.Number).toNumber() == APRIL_FOOLS_DAY;
+        } catch (e) {
+            var isApril = false;
+            if (now.month instanceof Lang.Number) {
+                isApril = now.month.toNumber() == APRIL_FOOLS_MONTH;
+            } else if (now.month instanceof Lang.String) {
+                var monthText = (now.month as Lang.String).toLower();
+                isApril = monthText == "apr" || monthText == "april";
+            } else {
+                isApril = now.month == :april;
+            }
+
+            return isApril && now.day == APRIL_FOOLS_DAY;
+        }
     }
 
     function onEnterSleep() {
