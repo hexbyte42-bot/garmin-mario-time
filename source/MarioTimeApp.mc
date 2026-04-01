@@ -36,7 +36,6 @@ class MarioTimeView extends WatchUi.WatchFace {
     static const BACKGROUND_COUNT = 4;
     static const JUMP_FRAME_INTERVAL_MS = 67;
     static const APRIL_FOOLS_MONTH = 4;
-    static const APRIL_FOOLS_MONTH_SYMBOL = :april;
     static const APRIL_FOOLS_DAY = 1;
     static const TIME_SLIDE_DISTANCE = 62;
     static const BLOCK_ANIMATION_DELAY = 0.44;
@@ -353,14 +352,23 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     function isAprilFoolsDay(now) {
-        var isApril = false;
-        if (now.month instanceof Lang.Number) {
-            isApril = now.month.toNumber() == APRIL_FOOLS_MONTH;
-        } else {
-            isApril = now.month == APRIL_FOOLS_MONTH_SYMBOL;
-        }
+        try {
+            var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+            return (shortInfo.month as Lang.Number).toNumber() == APRIL_FOOLS_MONTH &&
+                (shortInfo.day as Lang.Number).toNumber() == APRIL_FOOLS_DAY;
+        } catch (e) {
+            var isApril = false;
+            if (now.month instanceof Lang.Number) {
+                isApril = now.month.toNumber() == APRIL_FOOLS_MONTH;
+            } else if (now.month instanceof Lang.String) {
+                var monthText = (now.month as Lang.String).toLower();
+                isApril = monthText == "apr" || monthText == "april";
+            } else {
+                isApril = now.month == :april;
+            }
 
-        return isApril && now.day == APRIL_FOOLS_DAY;
+            return isApril && now.day == APRIL_FOOLS_DAY;
+        }
     }
 
     function onEnterSleep() {
