@@ -157,12 +157,38 @@ garmin-mario-time/
 - Reconcile docs with implementation as part of the same change
 - Favor stable Garmin lifecycle behavior over speculative shortcuts
 
+## 2025-07-24: Top bar HUD refactor (battery + date)
+
+### Changes
+
+- **Battery moved** from top-center to top-left, aligned with hour block center
+- **Date added** at top-right, format `EEE DD` (e.g. `THU 24`), `FONT_XTINY` white
+- **Circular screen awareness**: positions computed via `dx²+dy² < (radius-margin)²`
+- **Font baseline alignment**: battery (iconsFont, bitmap, y=top) and date (FONT_XTINY, system, y=baseline) use different y coordinates to share same visual center
+- **Date format fixed length** (7 chars: EEE+SPACE+DD) via manual English lookup arrays, locale-independent
+
+### Key Constants
+
+| Parameter | Value |
+|-----------|-------|
+| batteryTop (y) | 24 (top of 43px icon) |
+| iconCenterY (y) | 45 (VCENTER for date) |
+| battery x | hour block center (cX-50, center-justified) |
+| date x | `cX+maxDx-10` (right-justified, 10px left shift for balance) |
+| battery-date gap | ~13px to time blocks at y=80 |
+| circular margin | 15px from visible circle edge |
+
+### Branch & Merge
+
+- Branch: `feat/top-bar-battery-date` (10 commits)
+- Merged to master as `72bd3b9`
+- Stale branches deleted: `cleanup/resource-optimization`, `fix/mario-jump-stuck`, `fix/mario-jump-stuck-gemini`, `test/april-fools-bowser-fix`, `test/watchface-settings-callback`
+
 ## Next Work Items
 
-1. Validate the current build on a real FR265
-2. Add a lightweight validation script for build and doc consistency
-3. Decide whether to reintroduce selected companion-style features in a Garmin-native way
-4. Continue battery profiling on-device
+1. Add a lightweight validation script for build and doc consistency
+2. Decide whether to reintroduce selected companion-style features in a Garmin-native way
+3. Continue battery profiling on-device
 
 ## References
 
