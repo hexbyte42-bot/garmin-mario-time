@@ -181,7 +181,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     private function updateDateString(now) {
-        var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         dateStr = (shortInfo.month as Lang.String).toUpper() + " " +
                   shortInfo.day.format("%02d") + " " +
                   (shortInfo.day_of_week as Lang.String).toUpper();
