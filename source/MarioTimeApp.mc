@@ -250,26 +250,30 @@ class MarioTimeView extends WatchUi.WatchFace {
         var margin = 15;
         var safeR = cX - margin;
 
-        // Battery icon top at y=30, 43px tall → visual center at y=51
-        var barY = 30;
-        var iconCenterY = barY + 21;
+        // 1. Overall shift up by 8px (barY 30→22) for breathing room vs time blocks
+        // 3. Battery down 2px (batteryTop 22→24) to align visually with taller date font
+        var batteryTop = 24;
+        var iconCenterY = batteryTop + 21;  // ~45
 
         // Max safe horizontal offset at iconCenterY
         var dy = iconCenterY - cY;
         var dy2 = dy * dy;
         var maxDx = Math.sqrt(safeR * safeR - dy2).toNumber();
 
-        // Battery icon at top-left (left-aligned, text-top = barY)
+        // 2. Date shifted left by 10px to balance visual weight
+        var dateX = cX + maxDx - 10;
+
+        // Battery icon at top-left (left-aligned, text-top = batteryTop)
         if (iconsFont != null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
             if (isCharging) { batIcon = "l"; }
-            dc.drawText(cX - maxDx, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(cX - maxDx, batteryTop, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
         }
 
-        // Date at top-right (right-aligned, vertically centered on battery's center)
+        // Date at top-right (right-aligned, vertically centered on iconCenterY)
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cX + maxDx, iconCenterY, Graphics.FONT_XTINY, dateStr,
+        dc.drawText(dateX, iconCenterY, Graphics.FONT_XTINY, dateStr,
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
