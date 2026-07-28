@@ -243,18 +243,33 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     private function drawTopBar(dc) {
-        var barY = 18;
-        // Battery icon at top-left
+        // Screen is circular (radius ~208 for FR265).
+        // Compute safe positions within the visible circle.
+        var cX = screenWidth / 2;
+        var cY = screenHeight / 2;
+        var margin = 15;
+        var safeR = cX - margin;
+
+        // Battery icon top at y=30, 43px tall → visual center at y=51
+        var barY = 30;
+        var iconCenterY = barY + 21;
+
+        // Max safe horizontal offset at iconCenterY
+        var dy = iconCenterY - cY;
+        var dy2 = dy * dy;
+        var maxDx = Math.sqrt(safeR * safeR - dy2).toNumber();
+
+        // Battery icon at top-left (left-aligned, text-top = barY)
         if (iconsFont != null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
             if (isCharging) { batIcon = "l"; }
-            dc.drawText(0, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(cX - maxDx, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
         }
 
-        // Date at top-right, vertically centered on battery
+        // Date at top-right (right-aligned, vertically centered on battery's center)
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth, barY + 21, Graphics.FONT_XTINY, dateStr,
+        dc.drawText(cX + maxDx, iconCenterY, Graphics.FONT_XTINY, dateStr,
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
