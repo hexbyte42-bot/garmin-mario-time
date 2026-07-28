@@ -74,6 +74,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     var isCharging = false;
     var steps = 0;
     var heartRate = "--";
+    var dateStr = "";
 
     // User Settings
     var selectedCharacter = 0, selectedBackground = 0;
@@ -100,6 +101,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         lastMinute = now.min;
         refreshResources();
         updateSystemStats();
+        updateDateString(now);
         startMinuteChecker();
     }
 
@@ -167,7 +169,7 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         drawBlocks(dc, blockBounce, blockProgress);
         drawCharacter(dc, marioProgress);
-        drawBattery(dc);
+        drawTopBar(dc);
         drawActivityMetrics(dc);
     }
 
@@ -176,6 +178,12 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (!is24Hour) { h = (h > 12) ? h - 12 : (h == 0 ? 12 : h); }
         timeStr[0] = h.format("%02d");
         timeStr[1] = now.min.format("%02d");
+    }
+
+    private function updateDateString(now) {
+        var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+        dateStr = days[shortInfo.day_of_week - 1] + " " + shortInfo.day.format("%02d");
     }
 
     private function updateSystemStats() {
@@ -234,12 +242,42 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
 
-    private function drawBattery(dc) {
-        if (iconsFont == null) { return; }
+    private function drawTopBar(dc) {
+        // Screen is circular (radius ~208 for FR265).
+        // Compute safe positions within the visible circle.
+        var cX = screenWidth / 2;
+        var cY = screenHeight / 2;
+        var margin = 15;
+        var safeR = cX - margin;
+
+        // 1. Overall shift up by 8px for breathing room vs time blocks
+        // 3. Battery down 2px (batteryTop 22→24) to align visually with taller date font
+        var batteryTop = 24;
+        var iconCenterY = batteryTop + 21;  // ~45
+
+        // Max safe horizontal offset at iconCenterY
+        var dy = iconCenterY - cY;
+        var dy2 = dy * dy;
+        var maxDx = Math.sqrt(safeR * safeR - dy2).toNumber();
+
+        // 2. Date shifted left by 10px to balance visual weight
+        var dateX = cX + maxDx - 10;
+
+        // Hour block center = blockX + 50 = (screenWidth-200)/2 + 50 = screenWidth/2 - 50
+        var hourCenterX = cX - 50;
+
+        // Battery icon centered on hour block
+        if (iconsFont != null) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
+            if (isCharging) { batIcon = "l"; }
+            dc.drawText(hourCenterX, batteryTop, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
+        // Date at top-right (right-aligned, vertically centered on iconCenterY)
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
-        if (isCharging) { batIcon = "l"; }
-        dc.drawText(screenWidth / 2, 15, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(dateX, iconCenterY, Graphics.FONT_XTINY, dateStr,
+            Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     private function drawActivityMetrics(dc) {
@@ -301,6 +339,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         updateSystemStats();
         if (selectedBackground == 0) { updateBackgroundResource(now); }
         if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
+        updateDateString(now);
         if (shouldAnimate && !inLowPower) { startMarioJump(); }
         lastMinute = now.min;
     }
