@@ -74,6 +74,7 @@ class MarioTimeView extends WatchUi.WatchFace {
     var isCharging = false;
     var steps = 0;
     var heartRate = "--";
+    var dateStr = "";
 
     // User Settings
     var selectedCharacter = 0, selectedBackground = 0;
@@ -100,6 +101,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         lastMinute = now.min;
         refreshResources();
         updateSystemStats();
+        updateDateString(now);
         startMinuteChecker();
     }
 
@@ -167,7 +169,7 @@ class MarioTimeView extends WatchUi.WatchFace {
 
         drawBlocks(dc, blockBounce, blockProgress);
         drawCharacter(dc, marioProgress);
-        drawBattery(dc);
+        drawTopBar(dc);
         drawActivityMetrics(dc);
     }
 
@@ -176,6 +178,13 @@ class MarioTimeView extends WatchUi.WatchFace {
         if (!is24Hour) { h = (h > 12) ? h - 12 : (h == 0 ? 12 : h); }
         timeStr[0] = h.format("%02d");
         timeStr[1] = now.min.format("%02d");
+    }
+
+    private function updateDateString(now) {
+        var shortInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        dateStr = (shortInfo.month as Lang.String).toUpper() + " " +
+                  shortInfo.day.format("%02d") + " " +
+                  (shortInfo.day_of_week as Lang.String).toUpper();
     }
 
     private function updateSystemStats() {
@@ -234,12 +243,18 @@ class MarioTimeView extends WatchUi.WatchFace {
         }
     }
 
-    private function drawBattery(dc) {
-        if (iconsFont == null) { return; }
+    private function drawTopBar(dc) {
+        // Battery icon at top-left
+        if (iconsFont != null) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
+            if (isCharging) { batIcon = "l"; }
+            dc.drawText(24, 30, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+        }
+
+        // Date at top-right, same white pixel font as steps/heart rate
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
-        if (isCharging) { batIcon = "l"; }
-        dc.drawText(screenWidth / 2, 15, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(screenWidth - 24, 30, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     private function drawActivityMetrics(dc) {
@@ -301,6 +316,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         updateSystemStats();
         if (selectedBackground == 0) { updateBackgroundResource(now); }
         if (getEffectiveCharacterIndex(now) != activeCharacterIndex) { refreshResources(); }
+        updateDateString(now);
         if (shouldAnimate && !inLowPower) { startMarioJump(); }
         lastMinute = now.min;
     }
