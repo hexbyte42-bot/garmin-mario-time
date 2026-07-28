@@ -249,12 +249,12 @@ class MarioTimeView extends WatchUi.WatchFace {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
             if (isCharging) { batIcon = "l"; }
-            dc.drawText(16, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(0, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
         }
 
         // Date at top-right, vertically centered on battery
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth - 16, barY + 21, Graphics.FONT_XTINY, dateStr,
+        dc.drawText(screenWidth, barY + 21, Graphics.FONT_XTINY, dateStr,
             Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
