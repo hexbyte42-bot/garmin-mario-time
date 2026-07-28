@@ -243,17 +243,19 @@ class MarioTimeView extends WatchUi.WatchFace {
     }
 
     private function drawTopBar(dc) {
+        var barY = 18;
         // Battery icon at top-left
         if (iconsFont != null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
             if (isCharging) { batIcon = "l"; }
-            dc.drawText(24, 30, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(16, barY, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
         }
 
-        // Date at top-right, same white pixel font as steps/heart rate
+        // Date at top-right, vertically centered on battery
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(screenWidth - 24, 30, Graphics.FONT_XTINY, dateStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(screenWidth - 16, barY + 21, Graphics.FONT_XTINY, dateStr,
+            Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     private function drawActivityMetrics(dc) {
