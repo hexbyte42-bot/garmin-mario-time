@@ -250,7 +250,7 @@ class MarioTimeView extends WatchUi.WatchFace {
         var margin = 15;
         var safeR = cX - margin;
 
-        // 1. Overall shift up by 8px (barY 30→22) for breathing room vs time blocks
+        // 1. Overall shift up by 8px for breathing room vs time blocks
         // 3. Battery down 2px (batteryTop 22→24) to align visually with taller date font
         var batteryTop = 24;
         var iconCenterY = batteryTop + 21;  // ~45
@@ -263,12 +263,15 @@ class MarioTimeView extends WatchUi.WatchFace {
         // 2. Date shifted left by 10px to balance visual weight
         var dateX = cX + maxDx - 10;
 
-        // Battery icon at top-left
+        // Hour block center = blockX + 50 = (screenWidth-200)/2 + 50 = screenWidth/2 - 50
+        var hourCenterX = cX - 50;
+
+        // Battery icon centered on hour block
         if (iconsFont != null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             var batIcon = (batLevel > 90) ? "h" : (batLevel < 20 ? "k" : "m");
             if (isCharging) { batIcon = "l"; }
-            dc.drawText(150, batteryTop, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(hourCenterX, batteryTop, iconsFont, batIcon, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         // Date at top-right (right-aligned, vertically centered on iconCenterY)
